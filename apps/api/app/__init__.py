@@ -1,0 +1,1 @@
+"""YAQin API application package."""

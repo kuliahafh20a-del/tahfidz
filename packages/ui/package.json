@@ -1,0 +1,19 @@
+{
+  "name": "@yaqin/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@yaqin/config": "workspace:*",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3"
+  }
+}

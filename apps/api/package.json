@@ -1,0 +1,17 @@
+{
+  "name": "@yaqin/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "setup": "uv sync",
+    "dev": "uv run fastapi dev app/main.py --port 8000",
+    "format": "uv run ruff format .",
+    "format:check": "uv run ruff format --check .",
+    "lint": "uv run ruff check .",
+    "typecheck": "uv run mypy app tests",
+    "test": "uv run pytest",
+    "build": "uv run python -m compileall -q app",
+    "db:migrate": "uv run python -m app.db.migrations"
+  }
+}
+

@@ -1,0 +1,1 @@
+"""YAQin API test suite."""

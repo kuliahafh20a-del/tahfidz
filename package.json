@@ -1,0 +1,29 @@
+{
+  "name": "yaqin",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @yaqin/web --filter @yaqin/api dev",
+    "dev:web": "pnpm --filter @yaqin/web dev",
+    "dev:api": "pnpm --filter @yaqin/api dev",
+    "format": "pnpm -r --if-present format",
+    "format:check": "pnpm -r --if-present format:check",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "build": "pnpm -r --if-present build",
+    "db:migrate": "pnpm --filter @yaqin/api db:migrate",
+    "compose:config": "docker compose config --quiet",
+    "compose:build": "docker compose build",
+    "compose:up": "docker compose up --build --wait",
+    "compose:down": "docker compose down",
+    "compose:logs": "docker compose logs --follow web api db",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+  }
+}
+
