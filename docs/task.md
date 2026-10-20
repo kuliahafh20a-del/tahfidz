@@ -110,12 +110,12 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-001  
 **Hasil:** Setiap perubahan diperiksa otomatis sebelum dapat digabungkan.
 
-- [ ] Jalankan lint dan type check frontend.
-- [ ] Jalankan lint, type check, dan test backend.
-- [ ] Validasi migration dari database kosong.
-- [ ] Validasi OpenAPI dan generated TypeScript client.
-- [ ] Build image web dan API.
-- [ ] Tambahkan pemeriksaan secret dan dependency vulnerability dasar.
+- [x] Jalankan lint dan type check frontend.
+- [x] Jalankan lint, type check, dan test backend.
+- [x] Validasi migration dari database kosong.
+- [x] Validasi OpenAPI dan generated TypeScript client.
+- [x] Build image web dan API.
+- [x] Tambahkan pemeriksaan secret dan dependency vulnerability dasar.
 
 ## 4. Fondasi Backend dan Database
 

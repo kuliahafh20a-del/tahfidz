@@ -11,7 +11,9 @@
     "typecheck": "uv run mypy app tests",
     "test": "uv run pytest",
     "build": "uv run python -m compileall -q app",
-    "db:migrate": "uv run python -m app.db.migrations"
+    "db:migrate": "uv run python -m app.db.migrations",
+    "openapi:generate": "uv run python -m scripts.export_openapi",
+    "security:audit": "uv run pip-audit"
   }
 }
 

@@ -7,13 +7,18 @@
     ".": "./src/index.ts"
   },
   "scripts": {
+    "generate": "pnpm --filter @yaqin/api openapi:generate && openapi-typescript ../../apps/api/openapi.json -o src/schema.d.ts && prettier --write ../../apps/api/openapi.json src/schema.d.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@yaqin/config": "workspace:*",
+    "openapi-typescript": "^7.13.0",
     "prettier": "3.9.10",
     "typescript": "6.0.3"
+  },
+  "dependencies": {
+    "openapi-fetch": "^0.17.0"
   }
 }
