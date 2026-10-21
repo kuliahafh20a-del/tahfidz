@@ -138,14 +138,14 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-004  
 **Hasil:** Fakultas, jurusan, akun, dan role grant dapat disimpan serta divalidasi.
 
-- [ ] Buat tabel dan model `organizations`.
-- [ ] Buat tabel dan model `users`.
-- [ ] Buat tabel dan model `role_grants`.
-- [ ] Terapkan unique constraint login identifier.
-- [ ] Cegah siklus organisasi dan organisasi menjadi induk dirinya sendiri.
-- [ ] Validasi role admin terhadap jenis organisasi.
-- [ ] Tambahkan seed fakultas dan jurusan contoh.
-- [ ] Tambahkan test constraint dan scope dasar.
+- [x] Buat tabel dan model `organizations`.
+- [x] Buat tabel dan model `users`.
+- [x] Buat tabel dan model `role_grants`.
+- [x] Terapkan unique constraint login identifier.
+- [x] Cegah siklus organisasi dan organisasi menjadi induk dirinya sendiri.
+- [x] Validasi role admin terhadap jenis organisasi.
+- [x] Tambahkan seed fakultas dan jurusan contoh.
+- [x] Tambahkan test constraint dan scope dasar.
 
 ### TASK-006 - Implementasikan policy dan kurikulum berversi
 
