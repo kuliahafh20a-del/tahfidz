@@ -125,12 +125,12 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-001, TASK-002  
 **Hasil:** FastAPI terhubung ke PostgreSQL dengan konfigurasi aman dan migration yang dapat direproduksi.
 
-- [ ] Implementasikan settings tervalidasi dari environment.
-- [ ] Implementasikan async database session dan connection pool.
-- [ ] Siapkan schema `app`, `ops`, dan version table migration.
-- [ ] Tambahkan UUID generation dan timezone handling.
-- [ ] Tambahkan unit of work dan transaction boundary.
-- [ ] Buat migration smoke test serta rollback test yang relevan.
+- [x] Implementasikan settings tervalidasi dari environment.
+- [x] Implementasikan async database session dan connection pool.
+- [x] Siapkan schema `app`, `ops`, dan version table migration.
+- [x] Tambahkan UUID generation dan timezone handling.
+- [x] Tambahkan unit of work dan transaction boundary.
+- [x] Buat migration smoke test serta rollback test yang relevan.
 
 ### TASK-005 - Implementasikan model identitas dan organisasi
 

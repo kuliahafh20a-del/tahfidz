@@ -75,6 +75,30 @@
         "summary": "Liveness",
         "tags": ["health"]
       }
+    },
+    "/health/ready": {
+      "get": {
+        "description": "Report readiness without exposing connection or credential details.",
+        "operationId": "readiness_health_ready_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Readiness Health Ready Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Readiness",
+        "tags": ["health"]
+      }
     }
   }
 }
