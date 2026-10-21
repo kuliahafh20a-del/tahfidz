@@ -51,7 +51,7 @@ Gunakan `docker compose down --volumes` hanya ketika database development memang
 | `pnpm typecheck` | Menjalankan TypeScript dan mypy |
 | `pnpm test` | Menjalankan Vitest dan Pytest |
 | `pnpm build` | Membangun Next.js dan memvalidasi paket API |
-| `pnpm db:migrate` | Menjalankan entry point migration (placeholder sampai TASK-004) |
+| `pnpm db:migrate` | Menjalankan migration Alembic hingga revision terbaru |
 | `pnpm check` | Menjalankan seluruh pemeriksaan lokal |
 | `pnpm compose:config` | Memvalidasi konfigurasi Compose |
 | `pnpm compose:build` | Membangun image web dan API |

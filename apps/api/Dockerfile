@@ -27,6 +27,7 @@ WORKDIR /app
 
 COPY --from=builder --chown=yaqin:yaqin /app/.venv ./.venv
 COPY --chown=yaqin:yaqin apps/api/app ./app
+COPY --chown=yaqin:yaqin apps/api/alembic.ini ./alembic.ini
 
 USER yaqin
 
