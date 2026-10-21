@@ -41,6 +41,66 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/reference/assessment-rubric": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Assessment Rubric
+     * @description Return the rubric from the currently effective policy version.
+     */
+    get: operations["assessment_rubric_api_v1_reference_assessment_rubric_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/reference/curriculum": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Curriculum
+     * @description Return the complete published Juz 30 curriculum tree.
+     */
+    get: operations["curriculum_api_v1_reference_curriculum_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/reference/policies/current": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Current Policy
+     * @description Return the effective policy version summary.
+     */
+    get: operations["current_policy_api_v1_reference_policies_current_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/health/live": {
     parameters: {
       query?: never;
@@ -81,7 +141,149 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: never;
+  schemas: {
+    /**
+     * AssessmentRubricResponse
+     * @description The effective score policy used by assessment forms.
+     */
+    AssessmentRubricResponse: {
+      /**
+       * Policy Id
+       * Format: uuid
+       */
+      policy_id: string;
+      /** Policy Version */
+      policy_version: string;
+      score: components["schemas"]["IntegerScorePolicy"];
+    };
+    /**
+     * CurriculumResponse
+     * @description The complete effective curriculum reference tree.
+     */
+    CurriculumResponse: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Parts */
+      parts: components["schemas"]["PartResponse"][];
+      /**
+       * Published At
+       * Format: date-time
+       */
+      published_at: string;
+      /** Title */
+      title: string;
+      /** Version */
+      version: string;
+    };
+    /**
+     * IntegerScorePolicy
+     * @description The DEC-001 score scale exposed to every scoring interface.
+     */
+    IntegerScorePolicy: {
+      /**
+       * Allow Fractional
+       * @default false
+       */
+      allow_fractional: boolean;
+      /** Bands */
+      bands: components["schemas"]["RubricBand"][];
+      /**
+       * Display Decimals
+       * @default 0
+       */
+      display_decimals: number;
+      /**
+       * Maximum
+       * @default 10
+       */
+      maximum: number;
+      /**
+       * Minimum
+       * @default 1
+       */
+      minimum: number;
+      /**
+       * Step
+       * @default 1
+       */
+      step: number;
+    };
+    /**
+     * PartResponse
+     * @description One ordered curriculum part.
+     */
+    PartResponse: {
+      /** Sequence No */
+      sequence_no: number;
+      /** Themes */
+      themes: components["schemas"]["ThemeResponse"][];
+      /** Title */
+      title: string;
+    };
+    /**
+     * PolicySummary
+     * @description The effective policy version without unrelated rule internals.
+     */
+    PolicySummary: {
+      /**
+       * Effective From
+       * Format: date-time
+       */
+      effective_from: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Status */
+      status: string;
+      /** Version */
+      version: string;
+    };
+    /**
+     * RubricBand
+     * @description An inclusive integer score band and its approved description.
+     */
+    RubricBand: {
+      /** Description */
+      description: string;
+      /** Maximum */
+      maximum: number;
+      /** Minimum */
+      minimum: number;
+    };
+    /**
+     * ThemeRangeResponse
+     * @description An inclusive Juz 30 verse range.
+     */
+    ThemeRangeResponse: {
+      /** Ayah End */
+      ayah_end: number;
+      /** Ayah Start */
+      ayah_start: number;
+      /** Sequence No */
+      sequence_no: number;
+      /** Surah No */
+      surah_no: number;
+    };
+    /**
+     * ThemeResponse
+     * @description An ordered curriculum theme with one or more verse ranges.
+     */
+    ThemeResponse: {
+      /** Description */
+      description: string | null;
+      /** Ranges */
+      ranges: components["schemas"]["ThemeRangeResponse"][];
+      /** Sequence No */
+      sequence_no: number;
+      /** Title */
+      title: string;
+    };
+  };
   responses: never;
   parameters: never;
   requestBodies: never;
@@ -130,6 +332,66 @@ export interface operations {
           "application/json": {
             [key: string]: string;
           };
+        };
+      };
+    };
+  };
+  assessment_rubric_api_v1_reference_assessment_rubric_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssessmentRubricResponse"];
+        };
+      };
+    };
+  };
+  curriculum_api_v1_reference_curriculum_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CurriculumResponse"];
+        };
+      };
+    };
+  };
+  current_policy_api_v1_reference_policies_current_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PolicySummary"];
         };
       };
     };

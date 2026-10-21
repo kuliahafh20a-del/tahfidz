@@ -46,7 +46,7 @@ Keputusan berikut belum boleh dipaksakan menjadi nilai bawaan di database:
 
 - Cara agregasi nilai Mentor menjadi M.
 - Jumlah/bobot soal dan cara agregasi nilai Dosen menjadi D.
-- Dukungan skor desimal dan aturan pembulatan.
+- Aturan pembulatan nilai agregat.
 - Tindak lanjut setelah penilaian tema kelima.
 - Detail koreksi setelah isyarat, arti koreksi langsung, dan kejadian berulang.
 - Mandat koreksi, perubahan tenggat, akses media, dan retensi media.
@@ -107,7 +107,7 @@ Tabel historis/final tidak memakai hard delete. Jika perlu menonaktifkan data, g
 ### 4.4 Angka dan skor
 
 - Skor manual Mentor/Dosen berada pada rentang 1 sampai 10.
-- Kolom skor direkomendasikan memakai `numeric(4,2)` agar dapat mendukung keputusan desimal tanpa migrasi tipe; API dan constraint kebijakan menentukan apakah pecahan diizinkan.
+- Kolom skor direkomendasikan memakai `numeric(4,2)` agar perubahan kebijakan masa depan tidak memerlukan migrasi tipe; policy version awal dan validasi API hanya menerima bilangan bulat 1-10.
 - Jumlah kesalahan memakai integer non-negatif.
 - Nilai komponen K/M/D/N dapat `NULL`.
 - Perhitungan nilai menggunakan aritmetika desimal, bukan floating point.
@@ -1056,7 +1056,7 @@ Tidak ada ambang Dosen terpisah. Contoh hasil yang harus didukung:
 - K=10, M=10, D=NULL menghasilkan status belum lengkap, bukan Lulus.
 - Nilai kosong tidak menjadi 0 atau 1.
 
-Presisi, pembulatan tampilan, dan perbandingan nilai dekat ambang menunggu keputusan akademik. Simpan nilai mentah desimal dan versi kebijakan agar hasil dapat dihitung ulang.
+Pembulatan nilai agregat dan perbandingan nilai dekat ambang masih menunggu keputusan akademik. Simpan nilai mentah dengan tipe desimal dan versi kebijakan agar hasil dapat dihitung ulang; skor manual pada policy version awal tetap bilangan bulat.
 
 ## 15. Keamanan dan Privasi Data
 

@@ -2,7 +2,10 @@
 
 from fastapi import APIRouter
 
+from app.modules.curriculum.router import router as reference_router
+
 router = APIRouter()
+router.include_router(reference_router)
 
 
 @router.get("", tags=["system"])

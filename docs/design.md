@@ -552,7 +552,7 @@ Tambahan untuk formulir:
 
 ### 11.1 Skor manual
 
-Skor menggunakan rentang 1-10 dan memperlihatkan rubric di titik penilaian:
+Skor menggunakan bilangan bulat dalam rentang 1-10, tanpa angka pecahan, dan memperlihatkan rubric di titik penilaian:
 
 - 1-4: perlu perbaikan mendasar.
 - 5-7: cukup dengan catatan.

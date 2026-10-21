@@ -284,7 +284,7 @@ Tanggal riil, hari libur, dan tenggat efektif ditetapkan per angkatan. Semua tam
 | 5-7 | Mulai menguasai | Sebagian besar benar tetapi belum konsisten, masih memerlukan beberapa kode/bantuan, dan masih ada kesalahan pelafalan yang perlu diperbaiki. |
 | 8-10 | Menguasai dengan baik | Hafalan lancar, jawaban tepat, pelafalan baik, dan dapat menyelesaikan mandiri atau dengan sedikit kode. |
 
-Angka bawah digunakan ketika peserta baru memenuhi kriteria, angka tengah ketika cukup konsisten, dan angka atas ketika memenuhi dengan kuat. Skor 10 menunjukkan penguasaan sangat baik dan mandiri. Input kosong, kurang dari 1, atau lebih dari 10 ditolak. Dukungan skor desimal menunggu keputusan L05.
+Angka bawah digunakan ketika peserta baru memenuhi kriteria, angka tengah ketika cukup konsisten, dan angka atas ketika memenuhi dengan kuat. Skor 10 menunjukkan penguasaan sangat baik dan mandiri. Skor hanya menerima bilangan bulat 1-10 tanpa angka pecahan; input kosong atau nilai di luar rentang ditolak.
 
 ### 11.2 Kejadian dan kesalahan
 
@@ -746,7 +746,7 @@ Ukuran final pilot, perangkat/browser, kapasitas media, jam dukungan, dan kriter
 | L02 | Jumlah/bobot soal, agregasi D, jawaban sebagian, dan ujian ulang | Paket soal dan nilai ujian |
 | L03 | Tindak lanjut setelah lima penilaian tema | Alur lanjutan tanpa asumsi kesempatan keenam |
 | L04 | Detail diam, bantuan, koreksi setelah isyarat, arti `langsung`, dan kejadian berulang | Konsistensi pencatatan Mentor/Dosen |
-| L05 | Skor desimal, pembulatan, penutupan periode, dan peserta terlambat selesai | Validasi dan penerbitan nilai |
+| L05 | Pembulatan nilai agregat, penutupan periode, dan peserta terlambat selesai | Penerbitan nilai |
 | L06 | Mandat koreksi/tenggat/keberatan serta akses dan retensi media | Hak admin, privasi, dan pengesahan perubahan |
 | L07 | Ukuran pilot, perangkat/browser, kapasitas, dukungan, RPO/RTO, performa, dan indikator stabil | Uji lapangan dan gate rilis |
 | L08 | Teknologi, hosting, komposisi, dan kapasitas tim | Arsitektur implementasi dan jadwal |

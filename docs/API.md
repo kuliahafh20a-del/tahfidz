@@ -983,7 +983,7 @@ Server mengembalikan `allowed_actions` untuk membantu UI, tetapi field tersebut 
 ### 23.1 Penilaian umum
 
 - Skor final wajib 1-10 sesuai policy version.
-- Dukungan pecahan mengikuti kebijakan; tipe penyimpanan tetap desimal.
+- Policy version awal hanya menerima bilangan bulat 1-10; tipe penyimpanan tetap desimal untuk kompatibilitas kebijakan masa depan.
 - Insiden memiliki tepat satu kategori utama.
 - Keputusan `counted` dan alasannya disimpan.
 - Draft boleh belum lengkap, tetapi finalisasi tidak.
@@ -1204,7 +1204,6 @@ Router hanya menangani parsing, dependency, schema, dan HTTP mapping. Alokasi ke
 
 Kontrak final menunggu keputusan berikut:
 
-- Apakah skor pecahan diizinkan pada input Mentor/Dosen.
 - Metode agregasi nilai Mentor menjadi M.
 - Jumlah, bobot, dan agregasi soal menjadi D.
 - Aturan pembulatan N.

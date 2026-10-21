@@ -1,0 +1,119 @@
+"""Stable API schemas for policy and curriculum reference data."""
+
+from datetime import datetime
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+
+class RubricBand(BaseModel):
+    """An inclusive integer score band and its approved description."""
+
+    minimum: int = Field(ge=1, le=10)
+    maximum: int = Field(ge=1, le=10)
+    description: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def validate_order(self) -> RubricBand:
+        if self.maximum < self.minimum:
+            raise ValueError("rubric maximum must be greater than or equal to minimum")
+        return self
+
+
+class IntegerScorePolicy(BaseModel):
+    """The DEC-001 score scale exposed to every scoring interface."""
+
+    minimum: int = 1
+    maximum: int = 10
+    step: int = 1
+    allow_fractional: bool = False
+    display_decimals: int = 0
+    bands: list[RubricBand] = Field(min_length=3)
+
+    @model_validator(mode="after")
+    def validate_integer_policy(self) -> IntegerScorePolicy:
+        if (
+            self.minimum != 1
+            or self.maximum != 10
+            or self.step != 1
+            or self.allow_fractional
+            or self.display_decimals != 0
+        ):
+            raise ValueError("initial score policy must use whole numbers from 1 to 10")
+        if [(band.minimum, band.maximum) for band in self.bands] != [
+            (1, 4),
+            (5, 7),
+            (8, 10),
+        ]:
+            raise ValueError("rubric bands must cover 1-4, 5-7, and 8-10")
+        return self
+
+
+class PolicyRules(BaseModel):
+    """Validated JSON document stored by a policy version."""
+
+    schema_version: int = 1
+    score: IntegerScorePolicy
+
+
+class PolicySummary(BaseModel):
+    """The effective policy version without unrelated rule internals."""
+
+    id: UUID
+    version: str
+    status: str
+    effective_from: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AssessmentRubricResponse(BaseModel):
+    """The effective score policy used by assessment forms."""
+
+    policy_id: UUID
+    policy_version: str
+    score: IntegerScorePolicy
+
+
+class ThemeRangeResponse(BaseModel):
+    """An inclusive Juz 30 verse range."""
+
+    sequence_no: int
+    surah_no: int
+    ayah_start: int
+    ayah_end: int
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ThemeResponse(BaseModel):
+    """An ordered curriculum theme with one or more verse ranges."""
+
+    sequence_no: int
+    title: str
+    description: str | None
+    ranges: list[ThemeRangeResponse]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class PartResponse(BaseModel):
+    """One ordered curriculum part."""
+
+    sequence_no: int
+    title: str
+    themes: list[ThemeResponse]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class CurriculumResponse(BaseModel):
+    """The complete effective curriculum reference tree."""
+
+    id: UUID
+    version: str
+    title: str
+    published_at: datetime
+    parts: list[PartResponse]
+
+    model_config = ConfigDict(from_attributes=True)
