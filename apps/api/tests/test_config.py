@@ -64,3 +64,22 @@ def test_settings_reject_unknown_business_timezone() -> None:
                 "BUSINESS_TIMEZONE": "Mars/Olympus_Mons",
             }
         )
+
+
+def test_settings_normalize_video_host_allowlist() -> None:
+    settings = Settings.model_validate(
+        {
+            "DATABASE_URL": "postgresql://yaqin:secret@localhost/yaqin",
+            "VIDEO_ALLOWED_HOSTS": " YouTube.com, youtu.be,YOUTUBE.COM ",
+        }
+    )
+
+    assert settings.video_allowed_host_values == frozenset({"youtube.com", "youtu.be"})
+
+    with pytest.raises(ValidationError, match="hostname list"):
+        Settings.model_validate(
+            {
+                "DATABASE_URL": "postgresql://yaqin:secret@localhost/yaqin",
+                "VIDEO_ALLOWED_HOSTS": "https://youtube.com",
+            }
+        )

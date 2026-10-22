@@ -102,6 +102,11 @@ class Settings(BaseSettings):
         le=86_400,
         alias="RECOVERY_RATE_LIMIT_WINDOW_SECONDS",
     )
+    video_allowed_hosts: str = Field(
+        default="youtube.com,www.youtube.com,youtu.be",
+        min_length=1,
+        alias="VIDEO_ALLOWED_HOSTS",
+    )
 
     @field_validator("database_url", mode="before")
     @classmethod
@@ -130,6 +135,14 @@ class Settings(BaseSettings):
         except ZoneInfoNotFoundError as error:
             raise ValueError("BUSINESS_TIMEZONE must be a valid IANA timezone") from error
         return value
+
+    @field_validator("video_allowed_hosts")
+    @classmethod
+    def validate_video_allowed_hosts(cls, value: str) -> str:
+        hosts = [item.strip().lower().rstrip(".") for item in value.split(",")]
+        if not hosts or any(not item or ":" in item or "/" in item for item in hosts):
+            raise ValueError("VIDEO_ALLOWED_HOSTS must be a comma-separated hostname list")
+        return ",".join(dict.fromkeys(hosts))
 
     @model_validator(mode="after")
     def reject_development_password_outside_development(self) -> Self:
@@ -168,6 +181,10 @@ class Settings(BaseSettings):
     def secure_auth_cookie(self) -> bool:
         """Require HTTPS cookies outside local development and isolated tests."""
         return self.app_env not in {AppEnvironment.DEVELOPMENT, AppEnvironment.TEST}
+
+    @property
+    def video_allowed_host_values(self) -> frozenset[str]:
+        return frozenset(self.video_allowed_hosts.split(","))
 
     @property
     def database_connect_options(self) -> str:
