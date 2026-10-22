@@ -1,0 +1,143 @@
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.metrics section {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.metrics span,
+.metrics small {
+  color: var(--text-secondary);
+}
+
+.metrics strong {
+  color: var(--brand-950);
+  font-size: 2rem;
+}
+
+.metrics .dateMetric {
+  font-size: 1.25rem;
+}
+
+.nextTarget {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.nextTarget h3 {
+  margin: var(--space-1) 0;
+  font-size: 1.25rem;
+}
+
+.nextTarget p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.targetCode {
+  color: var(--brand-700);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.primaryLink,
+.secondaryLink {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-control);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.primaryLink {
+  flex: 0 0 auto;
+  color: var(--surface);
+  background: var(--brand-900);
+}
+
+.secondaryLink {
+  width: fit-content;
+  color: var(--brand-900);
+  background: var(--surface);
+  border: 1px solid var(--brand-700);
+}
+
+.actionUnavailable {
+  display: inline-block;
+  max-width: 18rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.partFilters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.partFilters button {
+  display: grid;
+  min-height: 4.5rem;
+  padding: var(--space-3);
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  gap: var(--space-1);
+  text-align: left;
+  cursor: pointer;
+}
+
+.partFilters button[aria-pressed="true"] {
+  color: var(--brand-950);
+  background: var(--brand-100);
+  border-color: var(--brand-700);
+}
+
+.partFilters small {
+  color: var(--text-secondary);
+}
+
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.skeleton {
+  height: 8rem;
+  background: linear-gradient(90deg, var(--canvas), var(--surface), var(--canvas));
+  background-size: 200% 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-surface);
+  animation: loading 1.2s ease-in-out infinite;
+}
+
+@keyframes loading {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 47.9375rem) {
+  .metrics,
+  .partFilters,
+  .skeletonGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .nextTarget {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

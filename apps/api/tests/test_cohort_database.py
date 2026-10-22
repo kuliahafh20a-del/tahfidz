@@ -15,6 +15,7 @@ from sqlalchemy.exc import IntegrityError
 from app.core.config import Settings
 from app.db.migrations import build_alembic_config
 from app.db.session import Database
+from app.modules.calendar.service import ParticipantTargetService
 from app.modules.cohorts.access import DepartmentActor
 from app.modules.cohorts.models import AssignmentRole
 from app.modules.cohorts.schemas import AssignmentCreate
@@ -348,6 +349,10 @@ async def assert_department_scope(
 
             enrollment = await service.get_enrollment(own_actor, program_context["enrollment"])
             assert enrollment.nim_snapshot == "NIM-001"
+
+            targets = ParticipantTargetService(session)
+            assert await targets.generate_for_enrollment(program_context["enrollment"]) == 44
+            assert await targets.generate_for_enrollment(program_context["enrollment"]) == 0
 
             first_rotation = await service.create_assignment(
                 own_actor,
