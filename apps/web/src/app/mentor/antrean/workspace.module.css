@@ -1,0 +1,150 @@
+.steps {
+  display: grid;
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--text-secondary);
+  gap: var(--space-3);
+}
+
+.supportCopy {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.filters button {
+  min-height: 2.4rem;
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-secondary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.filters button[aria-pressed="true"] {
+  color: var(--brand-950);
+  background: var(--brand-100);
+  border-color: var(--brand-700);
+  font-weight: 700;
+}
+
+.queue {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.queueItem {
+  padding: var(--space-4);
+  background: var(--brand-50);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-surface);
+}
+
+.queueItem header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.queueItem h3,
+.queueItem p {
+  margin: var(--space-1) 0 0;
+}
+
+.queueItem p,
+.participantMeta {
+  color: var(--text-secondary);
+}
+
+.participantMeta {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.sessionFacts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: var(--space-4) 0;
+  gap: var(--space-3);
+}
+
+.sessionFacts div {
+  padding: var(--space-3);
+  background: var(--surface);
+  border-radius: var(--radius-control);
+}
+
+.sessionFacts dt {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.sessionFacts dd {
+  margin: var(--space-1) 0 0;
+}
+
+.scheduleForm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+  gap: var(--space-3);
+}
+
+.scheduleForm label {
+  display: grid;
+  gap: var(--space-1);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.scheduleForm input,
+.scheduleForm select {
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  font: inherit;
+}
+
+.noteField,
+.scheduleForm button {
+  grid-column: 1 / -1;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-3);
+  gap: var(--space-3);
+}
+
+@media (max-width: 47.9375rem) {
+  .queueItem header,
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .sessionFacts,
+  .scheduleForm {
+    grid-template-columns: 1fr;
+  }
+
+  .noteField,
+  .scheduleForm button {
+    grid-column: 1;
+  }
+}
