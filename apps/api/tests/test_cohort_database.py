@@ -10,11 +10,18 @@ from uuid import UUID, uuid4
 import pytest
 from alembic import command
 from sqlalchemy import Engine, create_engine, func, inspect, select, text, update
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import DatabaseError, IntegrityError
 
 from app.core.config import Settings
 from app.db.migrations import build_alembic_config
 from app.db.session import Database
+from app.modules.assessments.models import AssessmentStatus, AssistanceType, ThemeOutcome
+from app.modules.assessments.schemas import IncidentInput, ThemeAssessmentDraftCreate
+from app.modules.assessments.service import (
+    AssessmentConflictError,
+    AssessmentResourceNotFoundError,
+    ThemeAssessmentService,
+)
 from app.modules.audit.models import AuditEvent
 from app.modules.calendar.access import ParticipantActor
 from app.modules.calendar.admin_schemas import DeadlineChangeRequest, DeadlineDecisionRequest
@@ -28,8 +35,14 @@ from app.modules.cohorts.access import DepartmentActor
 from app.modules.cohorts.models import AssignmentRole
 from app.modules.cohorts.schemas import AssignmentCreate
 from app.modules.cohorts.service import DepartmentProgramService, ResourceNotFoundError
+from app.modules.curriculum.models import Theme
 from app.modules.mentoring.access import MentorActor
-from app.modules.mentoring.models import SessionMethod, SessionStatus
+from app.modules.mentoring.models import (
+    MentoringSession,
+    SessionMethod,
+    SessionStatus,
+    SessionTheme,
+)
 from app.modules.mentoring.schemas import SessionCreate, SessionSchedule, SessionTransition
 from app.modules.mentoring.service import MentoringSessionService, SessionVersionConflictError
 
@@ -268,6 +281,36 @@ def test_enrollment_rejects_duplicate_participant_and_nim(
 @pytest.mark.migration
 @pytest.mark.skipif(
     MIGRATION_DATABASE_URL is None,
+    reason="MIGRATION_TEST_DATABASE_URL is required for assessment constraint tests",
+)
+def test_theme_assessment_requires_exactly_one_subtype_and_integer_score(
+    cohort_engine: Engine,
+    program_context: dict[str, Any],
+) -> None:
+    with cohort_engine.connect() as connection, connection.begin():
+        statement = text(
+            "INSERT INTO app.assessment_records "
+            "(id, enrollment_id, assessor_id, policy_version_id, kind, actual_at, "
+            "manual_score, status) VALUES "
+            "(:id, :enrollment_id, :assessor_id, :policy_id, 'theme', now(), "
+            ":manual_score, 'draft')"
+        )
+        values = {
+            "enrollment_id": program_context["enrollment"],
+            "assessor_id": program_context["mentor"],
+            "policy_id": program_context["policy_id"],
+        }
+        with pytest.raises(DatabaseError), connection.begin_nested():
+            connection.execute(statement, {**values, "id": uuid4(), "manual_score": 7})
+            connection.execute(text("SET CONSTRAINTS ALL IMMEDIATE"))
+
+        with pytest.raises(IntegrityError), connection.begin_nested():
+            connection.execute(statement, {**values, "id": uuid4(), "manual_score": 7.5})
+
+
+@pytest.mark.migration
+@pytest.mark.skipif(
+    MIGRATION_DATABASE_URL is None,
     reason="MIGRATION_TEST_DATABASE_URL is required for PostgreSQL constraint tests",
 )
 def test_assignments_require_scoped_grant_and_preserve_history(
@@ -496,6 +539,150 @@ async def assert_department_scope(
             await session.commit()
             assert started.status is SessionStatus.IN_PROGRESS
             assert started.actual_at is not None
+
+            assessment_service = ThemeAssessmentService(session)
+            draft = await assessment_service.create_draft(
+                mentor_actor,
+                session_proposal.id,
+                ThemeAssessmentDraftCreate(
+                    theme_id=active_targets[0].theme_id,
+                    actual_at=started.actual_at,
+                    manual_score=8,
+                    outcome=ThemeOutcome.ENOUGH,
+                    mentor_note="Hafalan lancar dan siap dituntaskan",
+                    incidents=[
+                        IncidentInput(
+                            location_text="QS An-Naba ayat 12",
+                            primary_category="tajwid",
+                            context="Panjang bacaan sempat kurang",
+                            assistance=AssistanceType.CUE,
+                            self_corrected=True,
+                            counted=False,
+                            counting_reason="Koreksi mandiri setelah isyarat ringan",
+                        )
+                    ],
+                ),
+                uuid4(),
+            )
+            await session.commit()
+            assert draft.status is AssessmentStatus.DRAFT
+            assert draft.attempt_no == 1
+            assert draft.policy_version_id == program_context["policy_id"]
+
+            final = await assessment_service.finalize(
+                mentor_actor,
+                draft.assessment_id,
+                draft.row_version,
+                uuid4(),
+            )
+            await session.commit()
+            await session.refresh(active_targets[0])
+            assessment_audits = await session.scalar(
+                select(func.count(AuditEvent.id)).where(
+                    AuditEvent.object_type == "theme_assessment",
+                    AuditEvent.object_reference == str(draft.assessment_id),
+                )
+            )
+            assert final.status is AssessmentStatus.FINAL
+            assert final.manual_score == 8
+            assert final.counted_incidents == 0
+            assert active_targets[0].status is TargetStatus.COMPLETED
+            assert assessment_audits == 2
+            with pytest.raises(AssessmentResourceNotFoundError):
+                await assessment_service.get_for_mentor(
+                    MentorActor(
+                        program_context["outside_mentor"],
+                        program_context["second_department"],
+                    ),
+                    final.assessment_id,
+                )
+
+            repeat_theme = await session.get(Theme, active_targets[1].theme_id)
+            assert repeat_theme is not None
+            repeat_session_ids = [session_proposal.id]
+            for _index in range(4):
+                actual_at = datetime.now(UTC)
+                repeat_session = MentoringSession(
+                    enrollment_id=program_context["enrollment"],
+                    part_id=repeat_theme.part_id,
+                    mentor_id=program_context["mentor"],
+                    proposed_at=actual_at,
+                    scheduled_at=actual_at,
+                    actual_at=actual_at,
+                    method=SessionMethod.VIDEO_CALL,
+                    status=SessionStatus.IN_PROGRESS,
+                )
+                session.add(repeat_session)
+                await session.flush()
+                session.add(
+                    SessionTheme(
+                        session_id=repeat_session.id,
+                        theme_id=active_targets[1].theme_id,
+                    )
+                )
+                await session.flush()
+                repeat_session_ids.append(repeat_session.id)
+
+            fifth_result = None
+            for attempt_index, repeat_session_id in enumerate(repeat_session_ids, start=1):
+                repeat_record = await session.get(MentoringSession, repeat_session_id)
+                assert repeat_record is not None and repeat_record.actual_at is not None
+                repeat_draft = await assessment_service.create_draft(
+                    mentor_actor,
+                    repeat_session_id,
+                    ThemeAssessmentDraftCreate(
+                        theme_id=active_targets[1].theme_id,
+                        actual_at=repeat_record.actual_at,
+                        manual_score=5,
+                        outcome=ThemeOutcome.REPEAT,
+                        mentor_note="Perlu mengulang kelancaran",
+                    ),
+                    uuid4(),
+                )
+                assert repeat_draft.attempt_no == attempt_index
+                fifth_result = await assessment_service.finalize(
+                    mentor_actor,
+                    repeat_draft.assessment_id,
+                    repeat_draft.row_version,
+                    uuid4(),
+                )
+                await session.flush()
+            assert fifth_result is not None
+            assert fifth_result.attempt_no == 5
+            assert fifth_result.outcome is ThemeOutcome.FOLLOW_UP
+
+            sixth_time = datetime.now(UTC)
+            sixth_session = MentoringSession(
+                enrollment_id=program_context["enrollment"],
+                part_id=repeat_theme.part_id,
+                mentor_id=program_context["mentor"],
+                proposed_at=sixth_time,
+                scheduled_at=sixth_time,
+                actual_at=sixth_time,
+                method=SessionMethod.VIDEO_CALL,
+                status=SessionStatus.IN_PROGRESS,
+            )
+            session.add(sixth_session)
+            await session.flush()
+            session.add(
+                SessionTheme(
+                    session_id=sixth_session.id,
+                    theme_id=active_targets[1].theme_id,
+                )
+            )
+            await session.flush()
+            with pytest.raises(AssessmentConflictError, match="sixth"):
+                await assessment_service.create_draft(
+                    mentor_actor,
+                    sixth_session.id,
+                    ThemeAssessmentDraftCreate(
+                        theme_id=active_targets[1].theme_id,
+                        actual_at=sixth_time,
+                        manual_score=5,
+                        outcome=ThemeOutcome.REPEAT,
+                    ),
+                    uuid4(),
+                )
 
             completed = await session_service.transition(
                 mentor_actor,

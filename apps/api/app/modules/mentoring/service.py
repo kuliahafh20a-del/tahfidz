@@ -13,6 +13,11 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.sql.elements import ColumnElement
 
 from app.core.time import ensure_utc, utc_now
+from app.modules.assessments.models import (
+    AssessmentRecord,
+    AssessmentStatus,
+    ThemeAssessment,
+)
 from app.modules.audit.models import AuditEvent
 from app.modules.calendar.access import ParticipantActor
 from app.modules.calendar.models import Target, TargetStatus
@@ -149,6 +154,10 @@ class MentoringSessionService:
         record = await self._participant_session(actor, session_id)
         return self._response(record, role="participant")
 
+    async def get_for_mentor(self, actor: MentorActor, session_id: UUID) -> SessionResponse:
+        record = await self._mentor_session(actor, session_id)
+        return self._response(record, role="mentor")
+
     async def cancel(
         self,
         actor: ParticipantActor,
@@ -264,6 +273,23 @@ class MentoringSessionService:
         expected, target_status = transitions[action]
         if record.status is not expected:
             raise SessionConflictError(f"session must be {expected.value} before {action}")
+        if action == "complete":
+            selected_count = await self.session.scalar(
+                select(func.count(SessionTheme.id)).where(SessionTheme.session_id == record.id)
+            )
+            final_count = await self.session.scalar(
+                select(func.count(ThemeAssessment.id))
+                .join(AssessmentRecord, AssessmentRecord.id == ThemeAssessment.id)
+                .join(SessionTheme, SessionTheme.id == ThemeAssessment.session_theme_id)
+                .where(
+                    SessionTheme.session_id == record.id,
+                    AssessmentRecord.status == AssessmentStatus.FINAL,
+                )
+            )
+            if int(final_count or 0) != int(selected_count or 0):
+                raise SessionConflictError(
+                    "every selected theme must be finalized before completing the session"
+                )
         previous = self._state(record)
         record.status = target_status
         if action == "start":
