@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_session
+from app.modules.auth.access import CsrfProtectionDependency
 from app.modules.cohorts.access import DepartmentActorDependency
 from app.modules.cohorts.schemas import (
     AssignmentCreate,
@@ -69,6 +70,7 @@ async def create_cohort(
     payload: CohortCreate,
     actor: DepartmentActorDependency,
     service: DepartmentProgramServiceDependency,
+    _csrf: CsrfProtectionDependency,
 ) -> CohortResponse:
     try:
         return await service.create_cohort(actor, payload)
@@ -94,6 +96,7 @@ async def create_enrollment(
     payload: EnrollmentCreate,
     actor: DepartmentActorDependency,
     service: DepartmentProgramServiceDependency,
+    _csrf: CsrfProtectionDependency,
 ) -> EnrollmentResponse:
     try:
         return await service.create_enrollment(actor, payload)
@@ -119,6 +122,7 @@ async def update_enrollment(
     payload: EnrollmentUpdate,
     actor: DepartmentActorDependency,
     service: DepartmentProgramServiceDependency,
+    _csrf: CsrfProtectionDependency,
 ) -> EnrollmentResponse:
     try:
         return await service.update_enrollment(actor, enrollment_id, payload)
@@ -151,6 +155,7 @@ async def create_assignment(
     payload: AssignmentCreate,
     actor: DepartmentActorDependency,
     service: DepartmentProgramServiceDependency,
+    _csrf: CsrfProtectionDependency,
 ) -> AssignmentResponse:
     try:
         return await service.create_assignment(actor, enrollment_id, payload)
@@ -167,6 +172,7 @@ async def end_assignment(
     payload: AssignmentEnd,
     actor: DepartmentActorDependency,
     service: DepartmentProgramServiceDependency,
+    _csrf: CsrfProtectionDependency,
 ) -> AssignmentResponse:
     try:
         return await service.end_assignment(actor, assignment_id, payload)

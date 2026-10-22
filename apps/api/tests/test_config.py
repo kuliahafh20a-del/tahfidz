@@ -17,7 +17,8 @@ def test_settings_normalize_postgresql_url_and_pool_options() -> None:
     assert settings.database_pool_size == 7
     assert "statement_timeout=5000" in settings.database_connect_options
     assert "timezone=UTC" in settings.database_connect_options
-    assert "secret" not in repr(settings)
+    assert "postgresql://yaqin:secret" not in repr(settings)
+    assert "session-secret-change" not in repr(settings)
 
 
 @pytest.mark.parametrize(
@@ -39,6 +40,18 @@ def test_settings_reject_placeholder_password_in_production() -> None:
             {
                 "APP_ENV": AppEnvironment.PRODUCTION,
                 "DATABASE_URL": ("postgresql+psycopg://yaqin:change-me-local-only@localhost/yaqin"),
+            }
+        )
+
+
+def test_settings_reject_placeholder_auth_secrets_in_production() -> None:
+    with pytest.raises(ValidationError, match="SESSION_SECRET"):
+        Settings.model_validate(
+            {
+                "APP_ENV": AppEnvironment.PRODUCTION,
+                "DATABASE_URL": "postgresql://yaqin:a-real-password@localhost/yaqin",
+                "SESSION_SECRET": "change-me-with-at-least-32-random-characters",
+                "CSRF_SECRET": "a-real-csrf-secret-with-at-least-32-characters",
             }
         )
 

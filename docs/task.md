@@ -186,16 +186,16 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-005  
 **Hasil:** Pengguna dapat masuk, keluar, memulihkan akun, dan memperoleh konteks peran aktif secara aman.
 
-- [ ] Implementasikan password hashing dengan pustaka terpelihara.
-- [ ] Implementasikan opaque server-side session.
-- [ ] Terapkan cookie `Secure`, `HttpOnly`, dan `SameSite`.
-- [ ] Implementasikan rotasi dan pencabutan session.
-- [ ] Implementasikan proteksi CSRF untuk mutasi.
-- [ ] Implementasikan token pemulihan sekali pakai dan berumur pendek.
-- [ ] Terapkan rate limit login dan pemulihan.
-- [ ] Buat endpoint `/auth/login`, `/auth/logout`, `/auth/session`, dan pemulihan.
-- [ ] Buat UI G01 Masuk dan pemulihan akun.
-- [ ] Pastikan pesan gagal tidak membocorkan keberadaan akun.
+- [x] Implementasikan password hashing dengan pustaka terpelihara.
+- [x] Implementasikan opaque server-side session.
+- [x] Terapkan cookie `Secure`, `HttpOnly`, dan `SameSite`.
+- [x] Implementasikan rotasi dan pencabutan session.
+- [x] Implementasikan proteksi CSRF untuk mutasi.
+- [x] Implementasikan token pemulihan sekali pakai dan berumur pendek.
+- [x] Terapkan rate limit login dan pemulihan.
+- [x] Buat endpoint `/auth/login`, `/auth/logout`, `/auth/session`, dan pemulihan.
+- [x] Buat UI G01 Masuk dan pemulihan akun.
+- [x] Pastikan pesan gagal tidak membocorkan keberadaan akun.
 
 ### TASK-009 - Implementasikan app shell dan design system
 

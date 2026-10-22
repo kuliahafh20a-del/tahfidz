@@ -4,6 +4,7 @@ from uuid import UUID
 from fastapi.testclient import TestClient
 
 from app.main import create_app
+from app.modules.auth.access import require_csrf
 from app.modules.cohorts.access import DepartmentActor, get_department_actor
 from app.modules.cohorts.models import AssignmentRole, CohortStatus, EnrollmentStatus
 from app.modules.cohorts.router import get_department_program_service
@@ -155,6 +156,7 @@ def department_client() -> TestClient:
     application = create_app()
     service = StubDepartmentProgramService()
     application.dependency_overrides[get_department_actor] = lambda: ACTOR
+    application.dependency_overrides[require_csrf] = lambda: None
     application.dependency_overrides[get_department_program_service] = lambda: service
     return TestClient(application)
 

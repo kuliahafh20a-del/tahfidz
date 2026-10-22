@@ -38,7 +38,7 @@ type Enrollment = {
 
 type EnrollmentDetail = Enrollment & { assignments: Assignment[] };
 
-const apiRoot = "/api/v1/department";
+const apiRoot = "/api/v1";
 
 async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${apiRoot}${path}`, {
@@ -63,12 +63,14 @@ function dateLabel(value: string | null): string {
 async function loadWorkspace(): Promise<{
   cohorts: Cohort[];
   enrollments: Enrollment[];
+  csrfToken: string;
 }> {
-  const [cohorts, enrollments] = await Promise.all([
-    apiRequest<Cohort[]>("/cohorts"),
-    apiRequest<Enrollment[]>("/enrollments"),
+  const [session, cohorts, enrollments] = await Promise.all([
+    apiRequest<{ csrf_token: string }>("/auth/session"),
+    apiRequest<Cohort[]>("/department/cohorts"),
+    apiRequest<Enrollment[]>("/department/enrollments"),
   ]);
-  return { cohorts, enrollments };
+  return { cohorts, enrollments, csrfToken: session.csrf_token };
 }
 
 export function ParticipantAssignmentWorkspace() {
@@ -77,11 +79,13 @@ export function ParticipantAssignmentWorkspace() {
   const [selected, setSelected] = useState<EnrollmentDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
+  const [csrfToken, setCsrfToken] = useState<string | null>(null);
 
   async function refresh(): Promise<void> {
     const workspace = await loadWorkspace();
     setCohorts(workspace.cohorts);
     setEnrollments(workspace.enrollments);
+    setCsrfToken(workspace.csrfToken);
   }
 
   useEffect(() => {
@@ -91,6 +95,7 @@ export function ParticipantAssignmentWorkspace() {
         if (!active) return;
         setCohorts(workspace.cohorts);
         setEnrollments(workspace.enrollments);
+        setCsrfToken(workspace.csrfToken);
       })
       .catch((error: unknown) => {
         if (active) setMessage(error instanceof Error ? error.message : "Data tidak tersedia.");
@@ -106,7 +111,7 @@ export function ParticipantAssignmentWorkspace() {
   async function openEnrollment(enrollmentId: string): Promise<void> {
     try {
       setMessage(null);
-      setSelected(await apiRequest<EnrollmentDetail>(`/enrollments/${enrollmentId}`));
+      setSelected(await apiRequest<EnrollmentDetail>(`/department/enrollments/${enrollmentId}`));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Detail peserta tidak tersedia.");
     }
@@ -116,8 +121,10 @@ export function ParticipantAssignmentWorkspace() {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     try {
-      await apiRequest<Enrollment>("/enrollments", {
+      if (csrfToken === null) throw new Error("Session belum siap. Muat ulang halaman.");
+      await apiRequest<Enrollment>("/department/enrollments", {
         method: "POST",
+        headers: { "X-CSRF-Token": csrfToken },
         body: JSON.stringify({
           user_id: form.get("user_id"),
           cohort_id: form.get("cohort_id"),
@@ -138,8 +145,10 @@ export function ParticipantAssignmentWorkspace() {
     const form = new FormData(event.currentTarget);
     const localStart = String(form.get("valid_from"));
     try {
-      await apiRequest<Assignment>(`/enrollments/${selected.id}/assignments`, {
+      if (csrfToken === null) throw new Error("Session belum siap. Muat ulang halaman.");
+      await apiRequest<Assignment>(`/department/enrollments/${selected.id}/assignments`, {
         method: "POST",
+        headers: { "X-CSRF-Token": csrfToken },
         body: JSON.stringify({
           role: form.get("role"),
           assignee_user_id: form.get("assignee_user_id"),

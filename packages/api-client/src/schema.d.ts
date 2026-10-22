@@ -41,6 +41,108 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/auth/login": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Login */
+    post: operations["login_api_v1_auth_login_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/auth/logout": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Logout */
+    post: operations["logout_api_v1_auth_logout_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/auth/password-recovery": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Request Password Recovery */
+    post: operations["request_password_recovery_api_v1_auth_password_recovery_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/auth/password-reset": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Reset Password */
+    post: operations["reset_password_api_v1_auth_password_reset_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/auth/session": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read Session */
+    get: operations["read_session_api_v1_auth_session_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/auth/session/rotate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Rotate Session */
+    post: operations["rotate_session_api_v1_auth_session_rotate_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/department/assignments/{assignment_id}/end": {
     parameters: {
       query?: never;
@@ -490,6 +592,11 @@ export interface components {
       nim_snapshot?: string | null;
       status?: components["schemas"]["EnrollmentStatus"] | null;
     };
+    /** GenericAuthResponse */
+    GenericAuthResponse: {
+      /** Message */
+      message: string;
+    };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -528,6 +635,13 @@ export interface components {
        */
       step: number;
     };
+    /** LoginRequest */
+    LoginRequest: {
+      /** Identifier */
+      identifier: string;
+      /** Password */
+      password: string;
+    };
     /**
      * PartResponse
      * @description One ordered curriculum part.
@@ -539,6 +653,18 @@ export interface components {
       themes: components["schemas"]["ThemeResponse"][];
       /** Title */
       title: string;
+    };
+    /** PasswordRecoveryRequest */
+    PasswordRecoveryRequest: {
+      /** Identifier */
+      identifier: string;
+    };
+    /** PasswordResetRequest */
+    PasswordResetRequest: {
+      /** New Password */
+      new_password: string;
+      /** Token */
+      token: string;
     };
     /**
      * PolicySummary
@@ -561,6 +687,37 @@ export interface components {
       version: string;
     };
     /**
+     * Role
+     * @description Organization-scoped capacities supported by the product.
+     * @enum {string}
+     */
+    Role:
+      | "participant"
+      | "mentor"
+      | "lecturer"
+      | "department_admin"
+      | "faculty_admin";
+    /** RoleContext */
+    RoleContext: {
+      /**
+       * Organization Id
+       * Format: uuid
+       */
+      organization_id: string;
+      /** Organization Name */
+      organization_name: string;
+      role: components["schemas"]["Role"];
+    };
+    /** RoleContextSelection */
+    RoleContextSelection: {
+      /**
+       * Organization Id
+       * Format: uuid
+       */
+      organization_id: string;
+      role: components["schemas"]["Role"];
+    };
+    /**
      * RubricBand
      * @description An inclusive integer score band and its approved description.
      */
@@ -571,6 +728,36 @@ export interface components {
       maximum: number;
       /** Minimum */
       minimum: number;
+    };
+    /** SessionResponse */
+    SessionResponse: {
+      active_context: components["schemas"]["RoleContext"] | null;
+      /** Csrf Token */
+      csrf_token: string;
+      /**
+       * Expires At
+       * Format: date-time
+       */
+      expires_at: string;
+      user: components["schemas"]["SessionUser"];
+    };
+    /** SessionRotateRequest */
+    SessionRotateRequest: {
+      active_context?: components["schemas"]["RoleContextSelection"] | null;
+    };
+    /** SessionUser */
+    SessionUser: {
+      /** Display Name */
+      display_name: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Login Identifier */
+      login_identifier: string;
+      /** Roles */
+      roles: components["schemas"]["RoleContext"][];
     };
     /**
      * ThemeRangeResponse
@@ -681,14 +868,216 @@ export interface operations {
       };
     };
   };
-  end_assignment_api_v1_department_assignments__assignment_id__end_post: {
+  login_api_v1_auth_login_post: {
     parameters: {
       query?: never;
       header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["LoginRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  logout_api_v1_auth_logout_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-CSRF-Token"?: string | null;
+      };
+      path?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  request_password_recovery_api_v1_auth_password_recovery_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PasswordRecoveryRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GenericAuthResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  reset_password_api_v1_auth_password_reset_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PasswordResetRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GenericAuthResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  read_session_api_v1_auth_session_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  rotate_session_api_v1_auth_session_rotate_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-CSRF-Token"?: string | null;
+      };
+      path?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SessionRotateRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  end_assignment_api_v1_department_assignments__assignment_id__end_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-CSRF-Token"?: string | null;
+      };
       path: {
         assignment_id: string;
       };
-      cookie?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
     };
     requestBody: {
       content: {
@@ -721,7 +1110,9 @@ export interface operations {
       query?: never;
       header?: never;
       path?: never;
-      cookie?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
     };
     requestBody?: never;
     responses: {
@@ -734,14 +1125,27 @@ export interface operations {
           "application/json": components["schemas"]["CohortResponse"][];
         };
       };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
     };
   };
   create_cohort_api_v1_department_cohorts_post: {
     parameters: {
       query?: never;
-      header?: never;
+      header?: {
+        "X-CSRF-Token"?: string | null;
+      };
       path?: never;
-      cookie?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
     };
     requestBody: {
       content: {
@@ -776,7 +1180,9 @@ export interface operations {
       };
       header?: never;
       path?: never;
-      cookie?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
     };
     requestBody?: never;
     responses: {
@@ -803,9 +1209,13 @@ export interface operations {
   create_enrollment_api_v1_department_enrollments_post: {
     parameters: {
       query?: never;
-      header?: never;
+      header?: {
+        "X-CSRF-Token"?: string | null;
+      };
       path?: never;
-      cookie?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
     };
     requestBody: {
       content: {
@@ -840,7 +1250,9 @@ export interface operations {
       path: {
         enrollment_id: string;
       };
-      cookie?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
     };
     requestBody?: never;
     responses: {
@@ -867,11 +1279,15 @@ export interface operations {
   update_enrollment_api_v1_department_enrollments__enrollment_id__patch: {
     parameters: {
       query?: never;
-      header?: never;
+      header?: {
+        "X-CSRF-Token"?: string | null;
+      };
       path: {
         enrollment_id: string;
       };
-      cookie?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
     };
     requestBody: {
       content: {
@@ -906,7 +1322,9 @@ export interface operations {
       path: {
         enrollment_id: string;
       };
-      cookie?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
     };
     requestBody?: never;
     responses: {
@@ -933,11 +1351,15 @@ export interface operations {
   create_assignment_api_v1_department_enrollments__enrollment_id__assignments_post: {
     parameters: {
       query?: never;
-      header?: never;
+      header?: {
+        "X-CSRF-Token"?: string | null;
+      };
       path: {
         enrollment_id: string;
       };
-      cookie?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
     };
     requestBody: {
       content: {

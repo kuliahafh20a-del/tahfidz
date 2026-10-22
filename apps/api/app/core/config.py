@@ -56,6 +56,52 @@ class Settings(BaseSettings):
         alias="DATABASE_IDLE_TRANSACTION_TIMEOUT_MS",
     )
     business_timezone: str = Field(default="Asia/Jakarta", alias="BUSINESS_TIMEZONE")
+    session_secret: SecretStr = Field(
+        default=SecretStr("development-session-secret-change-me-32"),
+        min_length=32,
+        alias="SESSION_SECRET",
+    )
+    csrf_secret: SecretStr = Field(
+        default=SecretStr("development-csrf-secret-change-me-32chars"),
+        min_length=32,
+        alias="CSRF_SECRET",
+    )
+    session_ttl_seconds: int = Field(
+        default=43_200,
+        ge=300,
+        le=604_800,
+        alias="SESSION_TTL_SECONDS",
+    )
+    recovery_token_ttl_seconds: int = Field(
+        default=1_800,
+        ge=300,
+        le=86_400,
+        alias="RECOVERY_TOKEN_TTL_SECONDS",
+    )
+    login_rate_limit_attempts: int = Field(
+        default=5,
+        ge=1,
+        le=100,
+        alias="LOGIN_RATE_LIMIT_ATTEMPTS",
+    )
+    login_rate_limit_window_seconds: int = Field(
+        default=900,
+        ge=60,
+        le=86_400,
+        alias="LOGIN_RATE_LIMIT_WINDOW_SECONDS",
+    )
+    recovery_rate_limit_attempts: int = Field(
+        default=3,
+        ge=1,
+        le=100,
+        alias="RECOVERY_RATE_LIMIT_ATTEMPTS",
+    )
+    recovery_rate_limit_window_seconds: int = Field(
+        default=3_600,
+        ge=60,
+        le=86_400,
+        alias="RECOVERY_RATE_LIMIT_WINDOW_SECONDS",
+    )
 
     @field_validator("database_url", mode="before")
     @classmethod
@@ -92,12 +138,36 @@ class Settings(BaseSettings):
             password = make_url(self.database_url_value).password
             if password in {None, "", "change-me-local-only", "change-me"}:
                 raise ValueError("DATABASE_URL must use a non-placeholder password")
+            forbidden_auth_secrets = {
+                "change-me-with-at-least-32-random-characters",
+                "development-session-secret-change-me-32",
+                "development-csrf-secret-change-me-32chars",
+            }
+            if self.session_secret_value in forbidden_auth_secrets:
+                raise ValueError("SESSION_SECRET must not use a placeholder")
+            if self.csrf_secret_value in forbidden_auth_secrets:
+                raise ValueError("CSRF_SECRET must not use a placeholder")
         return self
 
     @property
     def database_url_value(self) -> str:
         """Return the connection URL only at the database integration boundary."""
         return self.database_url.get_secret_value()
+
+    @property
+    def session_secret_value(self) -> str:
+        """Reveal the session HMAC secret only inside the authentication boundary."""
+        return self.session_secret.get_secret_value()
+
+    @property
+    def csrf_secret_value(self) -> str:
+        """Reveal the CSRF HMAC secret only inside the authentication boundary."""
+        return self.csrf_secret.get_secret_value()
+
+    @property
+    def secure_auth_cookie(self) -> bool:
+        """Require HTTPS cookies outside local development and isolated tests."""
+        return self.app_env not in {AppEnvironment.DEVELOPMENT, AppEnvironment.TEST}
 
     @property
     def database_connect_options(self) -> str:
