@@ -6,6 +6,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from app.api.contracts import ExpectedVersion
 from app.core.time import utc_now
 from app.modules.cohorts.models import AssignmentRole, CohortStatus, EnrollmentStatus
 
@@ -61,7 +62,7 @@ class EnrollmentCreate(BaseModel):
     status: EnrollmentStatus = EnrollmentStatus.ACTIVE
 
 
-class EnrollmentUpdate(BaseModel):
+class EnrollmentUpdate(ExpectedVersion):
     """Mutable enrollment fields that preserve identity and cohort history."""
 
     nim_snapshot: str | None = Field(default=None, min_length=1, max_length=64)
@@ -83,6 +84,7 @@ class EnrollmentResponse(BaseModel):
     nim_snapshot: str
     status: EnrollmentStatus
     joined_at: datetime
+    row_version: int = Field(ge=1)
 
     model_config = ConfigDict(from_attributes=True)
 

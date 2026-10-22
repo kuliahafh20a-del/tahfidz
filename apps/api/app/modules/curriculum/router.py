@@ -2,9 +2,10 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.contracts import SuccessEnvelope, success
 from app.db.session import get_session
 from app.modules.curriculum.schemas import (
     AssessmentRubricResponse,
@@ -34,28 +35,37 @@ def reference_not_found(error: LookupError) -> HTTPException:
     )
 
 
-@router.get("/assessment-rubric", response_model=AssessmentRubricResponse)
-async def assessment_rubric(service: ReferenceServiceDependency) -> AssessmentRubricResponse:
+@router.get("/assessment-rubric", response_model=SuccessEnvelope[AssessmentRubricResponse])
+async def assessment_rubric(
+    request: Request,
+    service: ReferenceServiceDependency,
+) -> SuccessEnvelope[AssessmentRubricResponse]:
     """Return the rubric from the currently effective policy version."""
     try:
-        return await service.assessment_rubric()
+        return success(request, await service.assessment_rubric())
     except LookupError as error:
         raise reference_not_found(error) from error
 
 
-@router.get("/curriculum", response_model=CurriculumResponse)
-async def curriculum(service: ReferenceServiceDependency) -> CurriculumResponse:
+@router.get("/curriculum", response_model=SuccessEnvelope[CurriculumResponse])
+async def curriculum(
+    request: Request,
+    service: ReferenceServiceDependency,
+) -> SuccessEnvelope[CurriculumResponse]:
     """Return the complete published Juz 30 curriculum tree."""
     try:
-        return await service.current_curriculum()
+        return success(request, await service.current_curriculum())
     except LookupError as error:
         raise reference_not_found(error) from error
 
 
-@router.get("/policies/current", response_model=PolicySummary)
-async def current_policy(service: ReferenceServiceDependency) -> PolicySummary:
+@router.get("/policies/current", response_model=SuccessEnvelope[PolicySummary])
+async def current_policy(
+    request: Request,
+    service: ReferenceServiceDependency,
+) -> SuccessEnvelope[PolicySummary]:
     """Return the effective policy version summary."""
     try:
-        return await service.current_policy()
+        return success(request, await service.current_policy())
     except LookupError as error:
         raise reference_not_found(error) from error

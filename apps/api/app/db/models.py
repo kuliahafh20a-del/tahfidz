@@ -13,6 +13,7 @@ from app.modules.curriculum.models import (
     ThemeRange,
 )
 from app.modules.identity.models import RoleGrant, User
+from app.modules.operations.models import IdempotencyRecord
 from app.modules.organizations.models import Organization
 
 MODEL_TYPES = (
@@ -30,6 +31,7 @@ MODEL_TYPES = (
     AuthSession,
     PasswordRecoveryToken,
     AuthRateLimitEvent,
+    IdempotencyRecord,
 )
 metadata: MetaData = Base.metadata
 

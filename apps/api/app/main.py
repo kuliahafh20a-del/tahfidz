@@ -1,5 +1,6 @@
 """FastAPI application factory and ASGI entry point."""
 
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import Final
@@ -8,6 +9,8 @@ from fastapi import FastAPI, HTTPException, status
 from pydantic import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.api.errors import install_error_handlers
+from app.api.middleware import install_request_context
 from app.api.v1.router import router as v1_router
 from app.db.session import close_database, get_database
 
@@ -25,12 +28,18 @@ async def lifespan(application: FastAPI) -> AsyncIterator[None]:
 
 def create_app() -> FastAPI:
     """Create the API without performing network or database work at import time."""
+    expose_contract = os.getenv("APP_ENV", "development") in {"development", "staging", "test"}
     application = FastAPI(
         title=APP_NAME,
         version=APP_VERSION,
         description="API aplikasi pendampingan hafalan Juz 30.",
         lifespan=lifespan,
+        openapi_url="/openapi.json" if expose_contract else None,
+        docs_url="/docs" if expose_contract else None,
+        redoc_url=None,
     )
+    install_request_context(application)
+    install_error_handlers(application)
 
     @application.get("/", tags=["system"])
     async def root() -> dict[str, str]:

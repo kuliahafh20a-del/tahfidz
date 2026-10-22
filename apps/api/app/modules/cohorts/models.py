@@ -13,6 +13,7 @@ from sqlalchemy import (
     Enum,
     ForeignKey,
     Index,
+    Integer,
     String,
     Text,
     UniqueConstraint,
@@ -166,6 +167,14 @@ class Enrollment(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         default=lambda: datetime.now(UTC),
         server_default=func.now(),
     )
+    row_version: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1,
+        server_default="1",
+    )
+
+    __mapper_args__ = {"version_id_col": row_version}
 
     user: Mapped[User] = relationship()
     cohort: Mapped[Cohort] = relationship(back_populates="enrollments")

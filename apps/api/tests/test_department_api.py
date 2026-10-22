@@ -1,8 +1,9 @@
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from uuid import UUID
 
 from fastapi.testclient import TestClient
 
+from app.core.config import Settings, get_settings
 from app.main import create_app
 from app.modules.auth.access import require_csrf
 from app.modules.cohorts.access import DepartmentActor, get_department_actor
@@ -19,7 +20,13 @@ from app.modules.cohorts.schemas import (
     EnrollmentUpdate,
     UserReference,
 )
-from app.modules.cohorts.service import ResourceNotFoundError
+from app.modules.cohorts.service import ResourceNotFoundError, VersionConflictError
+from app.modules.operations.models import IdempotencyRecord
+from app.modules.operations.service import (
+    IdempotencyClaim,
+    get_idempotency_store,
+    request_fingerprint,
+)
 
 ACTOR = DepartmentActor(
     user_id=UUID("40000000-0000-4000-8000-000000000001"),
@@ -31,6 +38,7 @@ PARTICIPANT_ID = UUID("40000000-0000-4000-8000-000000000005")
 STAFF_ID = UUID("40000000-0000-4000-8000-000000000006")
 ASSIGNMENT_ID = UUID("40000000-0000-4000-8000-000000000007")
 REFERENCE_ID = UUID("40000000-0000-4000-8000-000000000008")
+IDEMPOTENCY_KEY = UUID("40000000-0000-4000-8000-000000000009")
 STARTED_AT = datetime(2027, 1, 1, tzinfo=UTC)
 
 
@@ -58,6 +66,7 @@ def enrollment() -> EnrollmentResponse:
         nim_snapshot="NIM-001",
         status=EnrollmentStatus.ACTIVE,
         joined_at=STARTED_AT,
+        row_version=1,
     )
 
 
@@ -130,7 +139,9 @@ class StubDepartmentProgramService:
         enrollment_id: UUID,
         payload: EnrollmentUpdate,
     ) -> EnrollmentResponse:
-        del enrollment_id, payload
+        del enrollment_id
+        if payload.expected_version != 1:
+            raise VersionConflictError(1)
         return (await self.list_enrollments(actor))[0]
 
     async def list_assignments(
@@ -152,12 +163,55 @@ class StubDepartmentProgramService:
         return (await self.list_assignments(actor, enrollment_id))[0]
 
 
+class StubIdempotencyStore:
+    def __init__(self) -> None:
+        self.record: IdempotencyRecord | None = None
+        self.response_body: dict[str, object] | None = None
+
+    async def claim(
+        self,
+        *,
+        actor_id: UUID,
+        idempotency_key: UUID,
+        method: str,
+        normalized_path: str,
+        payload: object,
+        request_id: UUID,
+    ) -> IdempotencyClaim:
+        if self.record is None:
+            self.record = IdempotencyRecord(
+                actor_id=actor_id,
+                idempotency_key=idempotency_key,
+                method=method,
+                normalized_path=normalized_path,
+                request_hash=request_fingerprint(payload),
+                request_id=request_id,
+                expires_at=STARTED_AT + timedelta(days=1),
+            )
+        return IdempotencyClaim(record=self.record, replay_body=self.response_body)
+
+    async def complete(
+        self,
+        claim: IdempotencyClaim,
+        *,
+        response_body: dict[str, object],
+        response_status: int,
+    ) -> None:
+        del claim, response_status
+        self.response_body = response_body
+
+
 def department_client() -> TestClient:
     application = create_app()
     service = StubDepartmentProgramService()
     application.dependency_overrides[get_department_actor] = lambda: ACTOR
+    application.dependency_overrides[get_settings] = lambda: Settings.model_validate(
+        {"DATABASE_URL": "postgresql://test:test@localhost:5432/test"}
+    )
     application.dependency_overrides[require_csrf] = lambda: None
     application.dependency_overrides[get_department_program_service] = lambda: service
+    idempotency = StubIdempotencyStore()
+    application.dependency_overrides[get_idempotency_store] = lambda: idempotency
     return TestClient(application)
 
 
@@ -167,15 +221,16 @@ def test_department_admin_can_list_enrollments_and_assignment_history() -> None:
         detail = client.get(f"/api/v1/department/enrollments/{ENROLLMENT_ID}")
 
     assert enrollments.status_code == 200
-    assert enrollments.json()[0]["nim_snapshot"] == "NIM-001"
+    assert enrollments.json()["data"]["items"][0]["nim_snapshot"] == "NIM-001"
     assert detail.status_code == 200
-    assert detail.json()["assignments"][0]["staff"]["name"] == "Mentor Contoh"
+    assert detail.json()["data"]["assignments"][0]["staff"]["name"] == "Mentor Contoh"
 
 
 def test_department_admin_can_create_assignment() -> None:
     with department_client() as client:
         response = client.post(
             f"/api/v1/department/enrollments/{ENROLLMENT_ID}/assignments",
+            headers={"Idempotency-Key": str(IDEMPOTENCY_KEY)},
             json={
                 "role": "mentor",
                 "assignee_user_id": str(STAFF_ID),
@@ -186,8 +241,8 @@ def test_department_admin_can_create_assignment() -> None:
         )
 
     assert response.status_code == 201
-    assert response.json()["role"] == "mentor"
-    assert response.json()["valid_to"] is None
+    assert response.json()["data"]["role"] == "mentor"
+    assert response.json()["data"]["valid_to"] is None
 
 
 def test_out_of_scope_identifier_returns_stable_not_found() -> None:
@@ -195,4 +250,18 @@ def test_out_of_scope_identifier_returns_stable_not_found() -> None:
         response = client.get("/api/v1/department/enrollments/40000000-0000-4000-8000-000000000099")
 
     assert response.status_code == 404
-    assert response.json() == {"detail": {"code": "resource_not_found"}}
+    assert response.json()["code"] == "RESOURCE_NOT_FOUND"
+    assert response.json()["field_errors"] == {}
+
+
+def test_stale_enrollment_update_returns_version_conflict() -> None:
+    with department_client() as client:
+        response = client.patch(
+            f"/api/v1/department/enrollments/{ENROLLMENT_ID}",
+            json={"expected_version": 2, "status": "inactive"},
+        )
+
+    assert response.status_code == 409
+    assert response.json()["code"] == "VERSION_CONFLICT"
+    assert response.json()["details"] == {"current_version": 1}
+    assert "expected_version" in response.json()["field_errors"]
