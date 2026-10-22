@@ -60,6 +60,17 @@ function dateLabel(value: string | null): string {
   return new Intl.DateTimeFormat("id-ID", { dateStyle: "medium" }).format(new Date(value));
 }
 
+async function loadWorkspace(): Promise<{
+  cohorts: Cohort[];
+  enrollments: Enrollment[];
+}> {
+  const [cohorts, enrollments] = await Promise.all([
+    apiRequest<Cohort[]>("/cohorts"),
+    apiRequest<Enrollment[]>("/enrollments"),
+  ]);
+  return { cohorts, enrollments };
+}
+
 export function ParticipantAssignmentWorkspace() {
   const [cohorts, setCohorts] = useState<Cohort[]>([]);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
@@ -68,17 +79,19 @@ export function ParticipantAssignmentWorkspace() {
   const [message, setMessage] = useState<string | null>(null);
 
   async function refresh(): Promise<void> {
-    const [cohortData, enrollmentData] = await Promise.all([
-      apiRequest<Cohort[]>("/cohorts"),
-      apiRequest<Enrollment[]>("/enrollments"),
-    ]);
-    setCohorts(cohortData);
-    setEnrollments(enrollmentData);
+    const workspace = await loadWorkspace();
+    setCohorts(workspace.cohorts);
+    setEnrollments(workspace.enrollments);
   }
 
   useEffect(() => {
     let active = true;
-    void refresh()
+    void loadWorkspace()
+      .then((workspace) => {
+        if (!active) return;
+        setCohorts(workspace.cohorts);
+        setEnrollments(workspace.enrollments);
+      })
       .catch((error: unknown) => {
         if (active) setMessage(error instanceof Error ? error.message : "Data tidak tersedia.");
       })
