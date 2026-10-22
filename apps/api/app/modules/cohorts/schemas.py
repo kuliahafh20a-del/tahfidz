@@ -49,6 +49,7 @@ class CohortResponse(BaseModel):
     start_date: date
     close_date: date | None
     status: CohortStatus
+    calendar_version: int = Field(default=1, ge=1)
 
     model_config = ConfigDict(from_attributes=True)
 

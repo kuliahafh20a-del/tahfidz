@@ -86,6 +86,12 @@ class Cohort(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     start_date: Mapped[date] = mapped_column(Date, nullable=False)
     close_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    calendar_version: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1,
+        server_default="1",
+    )
     status: Mapped[CohortStatus] = mapped_column(
         Enum(
             CohortStatus,
