@@ -44,10 +44,10 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Prioritas:** P0  
 **Blocked by:** Tidak ada
 
-- [ ] Sahkan deskripsi rubric skor 1-4, 5-7, dan 8-10.
-- [ ] Putuskan apakah skor pecahan diizinkan.
-- [ ] Tentukan validasi serta cara menampilkan skor.
-- [ ] Dokumentasikan keputusan sebagai policy version awal.
+- [x] Sahkan deskripsi rubric skor 1-4, 5-7, dan 8-10.
+- [x] Putuskan apakah skor pecahan diizinkan.
+- [x] Tentukan validasi serta cara menampilkan skor.
+- [x] Dokumentasikan keputusan sebagai policy version awal.
 
 ### DEC-002 - Sahkan agregasi nilai Mentor dan Dosen
 
@@ -153,14 +153,14 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-004, DEC-001  
 **Hasil:** Policy version dan kurikulum lima bagian/44 tema tersedia sebagai data immutable setelah diterbitkan.
 
-- [ ] Buat tabel `policy_versions` dan `curriculum_versions`.
-- [ ] Buat tabel `parts`, `themes`, dan `theme_ranges`.
-- [ ] Terapkan urutan lima bagian dan urutan tema/rentang.
-- [ ] Validasi surah 78-114 dan rentang ayat.
-- [ ] Validasi distribusi tema 10, 8, 6, 5, dan 15 saat publish.
-- [ ] Cegah edit versi yang sudah published.
-- [ ] Seed kurikulum Juz 30 dan policy version awal.
-- [ ] Sediakan endpoint reference kurikulum, rubric, dan policy aktif.
+- [x] Buat tabel `policy_versions` dan `curriculum_versions`.
+- [x] Buat tabel `parts`, `themes`, dan `theme_ranges`.
+- [x] Terapkan urutan lima bagian dan urutan tema/rentang.
+- [x] Validasi surah 78-114 dan rentang ayat.
+- [x] Validasi distribusi tema 10, 8, 6, 5, dan 15 saat publish.
+- [x] Cegah edit versi yang sudah published.
+- [x] Seed kurikulum Juz 30 dan policy version awal.
+- [x] Sediakan endpoint reference kurikulum, rubric, dan policy aktif.
 
 ### TASK-007 - Implementasikan cohort, enrollment, dan assignment
 

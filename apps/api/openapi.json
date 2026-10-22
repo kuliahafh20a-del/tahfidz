@@ -1,4 +1,234 @@
 {
+  "components": {
+    "schemas": {
+      "AssessmentRubricResponse": {
+        "description": "The effective score policy used by assessment forms.",
+        "properties": {
+          "policy_id": {
+            "format": "uuid",
+            "title": "Policy Id",
+            "type": "string"
+          },
+          "policy_version": {
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "score": {
+            "$ref": "#/components/schemas/IntegerScorePolicy"
+          }
+        },
+        "required": ["policy_id", "policy_version", "score"],
+        "title": "AssessmentRubricResponse",
+        "type": "object"
+      },
+      "CurriculumResponse": {
+        "description": "The complete effective curriculum reference tree.",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "parts": {
+            "items": {
+              "$ref": "#/components/schemas/PartResponse"
+            },
+            "title": "Parts",
+            "type": "array"
+          },
+          "published_at": {
+            "format": "date-time",
+            "title": "Published At",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": ["id", "version", "title", "published_at", "parts"],
+        "title": "CurriculumResponse",
+        "type": "object"
+      },
+      "IntegerScorePolicy": {
+        "description": "The DEC-001 score scale exposed to every scoring interface.",
+        "properties": {
+          "allow_fractional": {
+            "default": false,
+            "title": "Allow Fractional",
+            "type": "boolean"
+          },
+          "bands": {
+            "items": {
+              "$ref": "#/components/schemas/RubricBand"
+            },
+            "minItems": 3,
+            "title": "Bands",
+            "type": "array"
+          },
+          "display_decimals": {
+            "default": 0,
+            "title": "Display Decimals",
+            "type": "integer"
+          },
+          "maximum": {
+            "default": 10,
+            "title": "Maximum",
+            "type": "integer"
+          },
+          "minimum": {
+            "default": 1,
+            "title": "Minimum",
+            "type": "integer"
+          },
+          "step": {
+            "default": 1,
+            "title": "Step",
+            "type": "integer"
+          }
+        },
+        "required": ["bands"],
+        "title": "IntegerScorePolicy",
+        "type": "object"
+      },
+      "PartResponse": {
+        "description": "One ordered curriculum part.",
+        "properties": {
+          "sequence_no": {
+            "title": "Sequence No",
+            "type": "integer"
+          },
+          "themes": {
+            "items": {
+              "$ref": "#/components/schemas/ThemeResponse"
+            },
+            "title": "Themes",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": ["sequence_no", "title", "themes"],
+        "title": "PartResponse",
+        "type": "object"
+      },
+      "PolicySummary": {
+        "description": "The effective policy version without unrelated rule internals.",
+        "properties": {
+          "effective_from": {
+            "format": "date-time",
+            "title": "Effective From",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": ["id", "version", "status", "effective_from"],
+        "title": "PolicySummary",
+        "type": "object"
+      },
+      "RubricBand": {
+        "description": "An inclusive integer score band and its approved description.",
+        "properties": {
+          "description": {
+            "minLength": 1,
+            "title": "Description",
+            "type": "string"
+          },
+          "maximum": {
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Maximum",
+            "type": "integer"
+          },
+          "minimum": {
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Minimum",
+            "type": "integer"
+          }
+        },
+        "required": ["minimum", "maximum", "description"],
+        "title": "RubricBand",
+        "type": "object"
+      },
+      "ThemeRangeResponse": {
+        "description": "An inclusive Juz 30 verse range.",
+        "properties": {
+          "ayah_end": {
+            "title": "Ayah End",
+            "type": "integer"
+          },
+          "ayah_start": {
+            "title": "Ayah Start",
+            "type": "integer"
+          },
+          "sequence_no": {
+            "title": "Sequence No",
+            "type": "integer"
+          },
+          "surah_no": {
+            "title": "Surah No",
+            "type": "integer"
+          }
+        },
+        "required": ["sequence_no", "surah_no", "ayah_start", "ayah_end"],
+        "title": "ThemeRangeResponse",
+        "type": "object"
+      },
+      "ThemeResponse": {
+        "description": "An ordered curriculum theme with one or more verse ranges.",
+        "properties": {
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "ranges": {
+            "items": {
+              "$ref": "#/components/schemas/ThemeRangeResponse"
+            },
+            "title": "Ranges",
+            "type": "array"
+          },
+          "sequence_no": {
+            "title": "Sequence No",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": ["sequence_no", "title", "description", "ranges"],
+        "title": "ThemeResponse",
+        "type": "object"
+      }
+    }
+  },
   "info": {
     "description": "API aplikasi pendampingan hafalan Juz 30.",
     "title": "YAQin API",
@@ -51,6 +281,66 @@
         },
         "summary": "Api Version",
         "tags": ["system"]
+      }
+    },
+    "/api/v1/reference/assessment-rubric": {
+      "get": {
+        "description": "Return the rubric from the currently effective policy version.",
+        "operationId": "assessment_rubric_api_v1_reference_assessment_rubric_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssessmentRubricResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Assessment Rubric",
+        "tags": ["reference"]
+      }
+    },
+    "/api/v1/reference/curriculum": {
+      "get": {
+        "description": "Return the complete published Juz 30 curriculum tree.",
+        "operationId": "curriculum_api_v1_reference_curriculum_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurriculumResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Curriculum",
+        "tags": ["reference"]
+      }
+    },
+    "/api/v1/reference/policies/current": {
+      "get": {
+        "description": "Return the effective policy version summary.",
+        "operationId": "current_policy_api_v1_reference_policies_current_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicySummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Current Policy",
+        "tags": ["reference"]
       }
     },
     "/health/live": {
