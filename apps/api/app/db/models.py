@@ -3,6 +3,7 @@
 from sqlalchemy import MetaData
 
 from app.db.base import Base
+from app.modules.cohorts.models import Assignment, Cohort, Enrollment
 from app.modules.curriculum.models import (
     CurriculumVersion,
     Part,
@@ -22,6 +23,9 @@ MODEL_TYPES = (
     Part,
     Theme,
     ThemeRange,
+    Cohort,
+    Enrollment,
+    Assignment,
 )
 metadata: MetaData = Base.metadata
 

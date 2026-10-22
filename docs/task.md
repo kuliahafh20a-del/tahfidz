@@ -168,15 +168,15 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-005, TASK-006  
 **Hasil:** Admin dapat membuat angkatan, mendaftarkan peserta, dan memberi penugasan Mentor/Dosen dengan riwayat.
 
-- [ ] Buat tabel `cohorts`, `enrollments`, dan `assignments`.
-- [ ] Validasi organisasi cohort sebagai jurusan.
-- [ ] Validasi duplikasi peserta dan NIM dalam cohort.
-- [ ] Validasi role grant petugas sebelum assignment.
-- [ ] Cegah interval assignment aktif yang tidak diperbolehkan saling tumpang tindih.
-- [ ] Akhiri assignment lama tanpa menghapus riwayat.
-- [ ] Buat API admin untuk enrollment dan assignment.
-- [ ] Buat UI J01 Peserta dan penugasan.
-- [ ] Tambahkan integration test otorisasi lintas jurusan.
+- [x] Buat tabel `cohorts`, `enrollments`, dan `assignments`.
+- [x] Validasi organisasi cohort sebagai jurusan.
+- [x] Validasi duplikasi peserta dan NIM dalam cohort.
+- [x] Validasi role grant petugas sebelum assignment.
+- [x] Cegah interval assignment aktif yang tidak diperbolehkan saling tumpang tindih.
+- [x] Akhiri assignment lama tanpa menghapus riwayat.
+- [x] Buat API admin untuk enrollment dan assignment.
+- [x] Buat UI J01 Peserta dan penugasan.
+- [x] Tambahkan integration test otorisasi lintas jurusan.
 
 ## 5. Autentikasi, Session, dan App Shell
 
