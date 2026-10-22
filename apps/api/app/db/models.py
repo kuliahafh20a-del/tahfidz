@@ -3,8 +3,9 @@
 from sqlalchemy import MetaData
 
 from app.db.base import Base
+from app.modules.audit.models import AuditEvent
 from app.modules.auth.models import AuthRateLimitEvent, AuthSession, PasswordRecoveryToken
-from app.modules.calendar.models import Target
+from app.modules.calendar.models import DeadlineChange, Target
 from app.modules.cohorts.models import Assignment, Cohort, Enrollment
 from app.modules.curriculum.models import (
     CurriculumVersion,
@@ -30,6 +31,8 @@ MODEL_TYPES = (
     Enrollment,
     Assignment,
     Target,
+    DeadlineChange,
+    AuditEvent,
     AuthSession,
     PasswordRecoveryToken,
     AuthRateLimitEvent,

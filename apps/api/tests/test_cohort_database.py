@@ -3,18 +3,25 @@ import os
 import selectors
 import sys
 from collections.abc import Coroutine, Iterator
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from typing import Any
 from uuid import UUID, uuid4
 
 import pytest
 from alembic import command
-from sqlalchemy import Engine, create_engine, inspect, text
+from sqlalchemy import Engine, create_engine, func, inspect, select, text, update
 from sqlalchemy.exc import IntegrityError
 
 from app.core.config import Settings
 from app.db.migrations import build_alembic_config
 from app.db.session import Database
+from app.modules.audit.models import AuditEvent
+from app.modules.calendar.admin_schemas import DeadlineChangeRequest, DeadlineDecisionRequest
+from app.modules.calendar.admin_service import (
+    CalendarVersionConflictError,
+    DeadlineChangeService,
+)
+from app.modules.calendar.models import Target
 from app.modules.calendar.service import ParticipantTargetService
 from app.modules.cohorts.access import DepartmentActor
 from app.modules.cohorts.models import AssignmentRole
@@ -52,6 +59,7 @@ def cohort_engine() -> Iterator[Engine]:
 def program_context(cohort_engine: Engine) -> dict[str, Any]:
     ids: dict[str, Any] = {
         "second_department": uuid4(),
+        "department_admin": uuid4(),
         "participant": uuid4(),
         "participant_two": uuid4(),
         "mentor": uuid4(),
@@ -89,6 +97,7 @@ def program_context(cohort_engine: Engine) -> dict[str, Any]:
             },
         )
         for key in (
+            "department_admin",
             "participant",
             "participant_two",
             "mentor",
@@ -109,6 +118,7 @@ def program_context(cohort_engine: Engine) -> dict[str, Any]:
 
         grant_start = datetime(2026, 1, 1, tzinfo=UTC)
         for user_key, role, organization_id in (
+            ("department_admin", "department_admin", SAMPLE_DEPARTMENT_ID),
             ("mentor", "mentor", SAMPLE_DEPARTMENT_ID),
             ("lecturer", "lecturer", SAMPLE_DEPARTMENT_ID),
             ("outside_mentor", "mentor", ids["second_department"]),
@@ -344,7 +354,7 @@ async def assert_department_scope(
     try:
         async with database.session_factory() as session:
             service = DepartmentProgramService(session)
-            own_actor = DepartmentActor(uuid4(), SAMPLE_DEPARTMENT_ID)
+            own_actor = DepartmentActor(program_context["department_admin"], SAMPLE_DEPARTMENT_ID)
             other_actor = DepartmentActor(uuid4(), program_context["second_department"])
 
             enrollment = await service.get_enrollment(own_actor, program_context["enrollment"])
@@ -353,6 +363,66 @@ async def assert_department_scope(
             targets = ParticipantTargetService(session)
             assert await targets.generate_for_enrollment(program_context["enrollment"]) == 44
             assert await targets.generate_for_enrollment(program_context["enrollment"]) == 0
+
+            target = await session.scalar(
+                select(Target)
+                .where(Target.enrollment_id == program_context["enrollment"])
+                .order_by(Target.effective_due_date)
+            )
+            assert target is not None
+            original_due_date = target.initial_due_date
+            deadline_service = DeadlineChangeService(session)
+            proposal = await deadline_service.propose(
+                own_actor,
+                program_context["cohort"],
+                DeadlineChangeRequest(
+                    target_ids=[target.id],
+                    new_due_date=date(2027, 1, 8),
+                    reason="Penyesuaian kalender akademik",
+                    impact_note="Target bergeser tujuh hari",
+                    expected_version=1,
+                ),
+                uuid4(),
+            )
+            await session.commit()
+            assert proposal.calendar_version == 2
+            with pytest.raises(CalendarVersionConflictError):
+                await deadline_service.preview(
+                    own_actor,
+                    program_context["cohort"],
+                    DeadlineChangeRequest(
+                        target_ids=[target.id],
+                        new_due_date=date(2027, 1, 15),
+                        reason="Versi lama",
+                        expected_version=1,
+                    ),
+                )
+            decision = await deadline_service.decide(
+                own_actor,
+                proposal.changes[0].id,
+                DeadlineDecisionRequest(expected_version=1, decision_note="Sesuai mandat"),
+                uuid4(),
+                approve=True,
+            )
+            await session.commit()
+            await session.refresh(target)
+            audit_count = await session.scalar(
+                select(func.count(AuditEvent.id)).where(
+                    AuditEvent.object_reference == str(proposal.changes[0].id)
+                )
+            )
+            assert decision.calendar_version == 3
+            assert target.initial_due_date == original_due_date
+            assert target.effective_due_date == date(2027, 1, 8)
+            assert audit_count == 2
+
+            with pytest.raises(IntegrityError):
+                await session.execute(
+                    update(Target)
+                    .where(Target.id == target.id)
+                    .values(effective_due_date=date(2027, 1, 15))
+                )
+            await session.rollback()
 
             first_rotation = await service.create_assignment(
                 own_actor,

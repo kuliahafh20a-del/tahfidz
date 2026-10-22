@@ -1,0 +1,192 @@
+.cohortPicker {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-6);
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-surface);
+  gap: var(--space-3);
+}
+
+.cohortPicker label {
+  font-weight: 700;
+}
+
+.cohortPicker select {
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+}
+
+.cohortPicker span {
+  margin-left: auto;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.calendarCard {
+  padding: var(--space-4);
+}
+
+.tableActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: calc(-1 * var(--space-2)) 0 var(--space-3);
+  gap: var(--space-3);
+}
+
+.tableActions p,
+.supportCopy,
+.emptyCopy {
+  color: var(--text-secondary);
+}
+
+.targetIdentity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.targetIdentity input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--brand-700);
+}
+
+.targetIdentity span,
+.dueDate {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.targetIdentity small {
+  color: var(--text-secondary);
+}
+
+.proposalForm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.proposalForm label {
+  display: grid;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.proposalForm label:nth-child(n + 2) {
+  grid-column: 1 / -1;
+}
+
+.proposalForm input,
+.proposalForm textarea {
+  width: 100%;
+  padding: var(--space-3);
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  font: inherit;
+}
+
+.proposalForm textarea {
+  resize: vertical;
+}
+
+.formActions,
+.decisionActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.formActions {
+  grid-column: 1 / -1;
+}
+
+.preview {
+  display: grid;
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+  gap: var(--space-4);
+}
+
+.previewSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text-secondary);
+  gap: var(--space-3);
+}
+
+.previewSummary strong {
+  color: var(--brand-950);
+}
+
+.changeList {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.changeList article {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  background: var(--warning-100);
+  border: 1px solid color-mix(in srgb, var(--warning-800) 20%, transparent);
+  border-radius: var(--radius-surface);
+  gap: var(--space-4);
+}
+
+.changeList article > div:first-child {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.changeList p,
+.changeList small {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.steps {
+  display: grid;
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--text-secondary);
+  gap: var(--space-3);
+}
+
+@media (max-width: 47.9375rem) {
+  .cohortPicker,
+  .tableActions,
+  .previewSummary,
+  .changeList article {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cohortPicker span {
+    margin-left: 0;
+  }
+
+  .proposalForm {
+    grid-template-columns: 1fr;
+  }
+
+  .proposalForm label,
+  .proposalForm label:nth-child(n + 2),
+  .formActions {
+    grid-column: 1;
+  }
+}

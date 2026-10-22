@@ -178,6 +178,91 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/department/cohorts/{cohort_id}/calendar": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Cohort Calendar */
+    get: operations["get_cohort_calendar_api_v1_department_cohorts__cohort_id__calendar_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/department/cohorts/{cohort_id}/deadline-changes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Propose Deadline Change */
+    post: operations["propose_deadline_change_api_v1_department_cohorts__cohort_id__deadline_changes_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/department/cohorts/{cohort_id}/deadline-changes/preview": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Preview Deadline Change */
+    post: operations["preview_deadline_change_api_v1_department_cohorts__cohort_id__deadline_changes_preview_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/department/deadline-changes/{change_id}/approve": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Approve Deadline Change */
+    post: operations["approve_deadline_change_api_v1_department_deadline_changes__change_id__approve_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/department/deadline-changes/{change_id}/reject": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Reject Deadline Change */
+    post: operations["reject_deadline_change_api_v1_department_deadline_changes__change_id__reject_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/department/enrollments": {
     parameters: {
       query?: never;
@@ -465,6 +550,93 @@ export interface components {
      * @enum {string}
      */
     AssignmentRole: "mentor" | "lecturer";
+    /** CalendarParticipant */
+    CalendarParticipant: {
+      /** Display Name */
+      display_name: string;
+      /**
+       * Enrollment Id
+       * Format: uuid
+       */
+      enrollment_id: string;
+      /** Nim */
+      nim: string;
+      /**
+       * User Id
+       * Format: uuid
+       */
+      user_id: string;
+    };
+    /** CalendarTargetResponse */
+    CalendarTargetResponse: {
+      /** Allowed Actions */
+      allowed_actions: string[];
+      /**
+       * Effective Due Date
+       * Format: date
+       */
+      effective_due_date: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Initial Due Date
+       * Format: date
+       */
+      initial_due_date: string;
+      participant: components["schemas"]["CalendarParticipant"];
+      pending_change: components["schemas"]["DeadlineChangeResponse"] | null;
+      status: components["schemas"]["TargetStatus"];
+      theme: components["schemas"]["CalendarTheme"];
+    };
+    /** CalendarTheme */
+    CalendarTheme: {
+      /** Code */
+      code: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /** Part Name */
+      part_name: string;
+      /** Part No */
+      part_no: number;
+    };
+    /** CohortCalendarResponse */
+    CohortCalendarResponse: {
+      /** Allowed Actions */
+      allowed_actions: string[];
+      /** Calendar Version */
+      calendar_version: number;
+      cohort: components["schemas"]["CohortCalendarSummary"];
+      /** History */
+      history: components["schemas"]["DeadlineChangeResponse"][];
+      /** Targets */
+      targets: components["schemas"]["CalendarTargetResponse"][];
+    };
+    /** CohortCalendarSummary */
+    CohortCalendarSummary: {
+      /** Close Date */
+      close_date: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /**
+       * Start Date
+       * Format: date
+       */
+      start_date: string;
+      status: components["schemas"]["CohortStatus"];
+    };
     /**
      * CohortCreate
      * @description Create one department-owned cohort.
@@ -497,6 +669,11 @@ export interface components {
      * @description A cohort visible inside one department scope.
      */
     CohortResponse: {
+      /**
+       * Calendar Version
+       * @default 1
+       */
+      calendar_version: number;
       /** Close Date */
       close_date: string | null;
       /**
@@ -587,6 +764,149 @@ export interface components {
       progress: components["schemas"]["ProgressResponse"];
       /** Upcoming Targets */
       upcoming_targets: components["schemas"]["TargetResponse"][];
+    };
+    /** DeadlineChangeBatchResponse */
+    DeadlineChangeBatchResponse: {
+      /** Calendar Version */
+      calendar_version: number;
+      /** Changes */
+      changes: components["schemas"]["DeadlineChangeResponse"][];
+      /**
+       * Cohort Id
+       * Format: uuid
+       */
+      cohort_id: string;
+    };
+    /** DeadlineChangePreview */
+    DeadlineChangePreview: {
+      /** Affected Count */
+      affected_count: number;
+      /** Calendar Version */
+      calendar_version: number;
+      /**
+       * Cohort Id
+       * Format: uuid
+       */
+      cohort_id: string;
+      /**
+       * Earliest Old Date
+       * Format: date
+       */
+      earliest_old_date: string;
+      /** Impacts */
+      impacts: components["schemas"]["DeadlineImpactItem"][];
+      /**
+       * Latest Old Date
+       * Format: date
+       */
+      latest_old_date: string;
+      /**
+       * New Due Date
+       * Format: date
+       */
+      new_due_date: string;
+      /**
+       * Requires Approval
+       * @default true
+       */
+      requires_approval: boolean;
+    };
+    /** DeadlineChangeRequest */
+    DeadlineChangeRequest: {
+      /** Expected Version */
+      expected_version: number;
+      /** Impact Note */
+      impact_note?: string | null;
+      /**
+       * New Due Date
+       * Format: date
+       */
+      new_due_date: string;
+      /** Reason */
+      reason: string;
+      /** Target Ids */
+      target_ids: string[];
+    };
+    /** DeadlineChangeResponse */
+    DeadlineChangeResponse: {
+      /** Approved By */
+      approved_by: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string;
+      /** Decided At */
+      decided_at: string | null;
+      /** Decision Note */
+      decision_note: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Impact Note */
+      impact_note: string | null;
+      /**
+       * New Date
+       * Format: date
+       */
+      new_date: string;
+      /**
+       * Old Date
+       * Format: date
+       */
+      old_date: string;
+      /** Reason */
+      reason: string;
+      /**
+       * Requested By
+       * Format: uuid
+       */
+      requested_by: string;
+      /** Row Version */
+      row_version: number;
+      status: components["schemas"]["DeadlineChangeStatus"];
+      /**
+       * Target Id
+       * Format: uuid
+       */
+      target_id: string;
+    };
+    /**
+     * DeadlineChangeStatus
+     * @description Review lifecycle for a proposed effective deadline.
+     * @enum {string}
+     */
+    DeadlineChangeStatus: "pending" | "approved" | "rejected" | "cancelled";
+    /** DeadlineDecisionRequest */
+    DeadlineDecisionRequest: {
+      /** Decision Note */
+      decision_note?: string | null;
+      /** Expected Version */
+      expected_version: number;
+    };
+    /** DeadlineImpactItem */
+    DeadlineImpactItem: {
+      /**
+       * New Date
+       * Format: date
+       */
+      new_date: string;
+      /**
+       * Old Date
+       * Format: date
+       */
+      old_date: string;
+      participant: components["schemas"]["CalendarParticipant"];
+      /** Shift Days */
+      shift_days: number;
+      /**
+       * Target Id
+       * Format: uuid
+       */
+      target_id: string;
+      theme: components["schemas"]["CalendarTheme"];
     };
     /**
      * EnrollmentCreate
@@ -959,6 +1279,17 @@ export interface components {
       /** Version */
       version?: number | null;
     };
+    /** SuccessEnvelope[CohortCalendarResponse] */
+    SuccessEnvelope_CohortCalendarResponse_: {
+      data: components["schemas"]["CohortCalendarResponse"];
+      /**
+       * Request Id
+       * Format: uuid
+       */
+      request_id: string;
+      /** Version */
+      version?: number | null;
+    };
     /** SuccessEnvelope[CohortResponse] */
     SuccessEnvelope_CohortResponse_: {
       data: components["schemas"]["CohortResponse"];
@@ -1028,6 +1359,28 @@ export interface components {
     /** SuccessEnvelope[DashboardResponse] */
     SuccessEnvelope_DashboardResponse_: {
       data: components["schemas"]["DashboardResponse"];
+      /**
+       * Request Id
+       * Format: uuid
+       */
+      request_id: string;
+      /** Version */
+      version?: number | null;
+    };
+    /** SuccessEnvelope[DeadlineChangeBatchResponse] */
+    SuccessEnvelope_DeadlineChangeBatchResponse_: {
+      data: components["schemas"]["DeadlineChangeBatchResponse"];
+      /**
+       * Request Id
+       * Format: uuid
+       */
+      request_id: string;
+      /** Version */
+      version?: number | null;
+    };
+    /** SuccessEnvelope[DeadlineChangePreview] */
+    SuccessEnvelope_DeadlineChangePreview_: {
+      data: components["schemas"]["DeadlineChangePreview"];
       /**
        * Request Id
        * Format: uuid
@@ -2219,6 +2572,561 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["SuccessEnvelope_CohortResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  get_cohort_calendar_api_v1_department_cohorts__cohort_id__calendar_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        cohort_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_CohortCalendarResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  propose_deadline_change_api_v1_department_cohorts__cohort_id__deadline_changes_post: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description UUID unique to one logical command and payload. */
+        "Idempotency-Key": string;
+        "X-CSRF-Token"?: string | null;
+      };
+      path: {
+        cohort_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeadlineChangeRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_DeadlineChangeBatchResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  preview_deadline_change_api_v1_department_cohorts__cohort_id__deadline_changes_preview_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-CSRF-Token"?: string | null;
+      };
+      path: {
+        cohort_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeadlineChangeRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_DeadlineChangePreview_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  approve_deadline_change_api_v1_department_deadline_changes__change_id__approve_post: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description UUID unique to one logical command and payload. */
+        "Idempotency-Key": string;
+        "X-CSRF-Token"?: string | null;
+      };
+      path: {
+        change_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeadlineDecisionRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_DeadlineChangeBatchResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  reject_deadline_change_api_v1_department_deadline_changes__change_id__reject_post: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description UUID unique to one logical command and payload. */
+        "Idempotency-Key": string;
+        "X-CSRF-Token"?: string | null;
+      };
+      path: {
+        change_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["DeadlineDecisionRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_DeadlineChangeBatchResponse_"];
         };
       };
       /** @description Bad Request */
