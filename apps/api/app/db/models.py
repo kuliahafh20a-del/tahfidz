@@ -3,6 +3,7 @@
 from sqlalchemy import MetaData
 
 from app.db.base import Base
+from app.modules.assessments.models import AssessmentRecord, Incident, ThemeAssessment
 from app.modules.audit.models import AuditEvent
 from app.modules.auth.models import AuthRateLimitEvent, AuthSession, PasswordRecoveryToken
 from app.modules.calendar.models import DeadlineChange, Target
@@ -35,6 +36,9 @@ MODEL_TYPES = (
     DeadlineChange,
     MentoringSession,
     SessionTheme,
+    AssessmentRecord,
+    ThemeAssessment,
+    Incident,
     AuditEvent,
     AuthSession,
     PasswordRecoveryToken,

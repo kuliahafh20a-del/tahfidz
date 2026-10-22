@@ -131,6 +131,19 @@
   gap: var(--space-3);
 }
 
+.assessmentLink {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-4);
+  color: var(--surface);
+  background: var(--brand-900);
+  border-radius: var(--radius-control);
+  font-weight: 700;
+  text-decoration: none;
+}
+
 @media (max-width: 47.9375rem) {
   .queueItem header,
   .actions {

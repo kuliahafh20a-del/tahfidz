@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import { AppShell, PageHeader, SupportPanel, WorkSupportLayout } from "@/components/shell";
@@ -285,6 +286,11 @@ export function MentorQueueWorkspace() {
                     ) : null}
 
                     <div className={styles.actions}>
+                      {item.status === "in_progress" ? (
+                        <Link className={styles.assessmentLink} href={`/mentor/sesi/${item.id}`}>
+                          Buka catatan pembimbingan
+                        </Link>
+                      ) : null}
                       {item.allowed_actions.includes("no_show") ? (
                         <Button
                           disabled={busyId === item.id}

@@ -237,6 +237,21 @@ async def mentor_queue(
     )
 
 
+@router.get("/mentor/sessions/{session_id}", response_model=SuccessEnvelope[SessionResponse])
+async def read_mentor_session(
+    session_id: UUID,
+    request: Request,
+    actor: MentorActorDependency,
+    service: MentoringSessionServiceDependency,
+) -> SuccessEnvelope[SessionResponse]:
+    require_query_allowlist(request, set())
+    try:
+        result = await service.get_for_mentor(actor, session_id)
+        return success(request, result, version=result.row_version)
+    except SessionResourceNotFoundError as error:
+        raise_session_error(error)
+
+
 @router.patch("/sessions/{session_id}", response_model=SuccessEnvelope[SessionResponse])
 async def schedule_session(
     session_id: UUID,
