@@ -2,10 +2,12 @@
 
 from fastapi import APIRouter
 
+from app.modules.auth.router import router as auth_router
 from app.modules.cohorts.router import router as department_router
 from app.modules.curriculum.router import router as reference_router
 
 router = APIRouter()
+router.include_router(auth_router)
 router.include_router(reference_router)
 router.include_router(department_router)
 

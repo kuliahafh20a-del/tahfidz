@@ -238,6 +238,7 @@ Frontend mengambil token CSRF dari response session/bootstrap. Token tidak disim
 | POST | `/auth/login` | Publik | Membuat session web |
 | POST | `/auth/logout` | Login | Mencabut session aktif |
 | GET | `/auth/session` | Login | Membaca user, role, organisasi, CSRF, dan masa session |
+| POST | `/auth/session/rotate` | Login | Merotasi ID session dan memilih konteks role aktif |
 | POST | `/auth/password-recovery` | Publik | Memulai pemulihan tanpa membocorkan akun |
 | POST | `/auth/password-reset` | Publik | Menggunakan token satu kali |
 | GET | `/me` | Login | Profil dan konteks otorisasi aktif |
@@ -274,6 +275,8 @@ Respons `200`:
 ```
 
 Login dan pemulihan memakai rate limit per IP dan identitas ternormalisasi. Pesan gagal tidak membedakan akun tidak ada, tidak aktif, atau kata sandi salah.
+
+Implementasi menyimpan session ID, token CSRF, dan token pemulihan hanya dalam bentuk keyed hash. Token pemulihan diteruskan melalui boundary delivery tepercaya dan tidak pernah dimasukkan ke body respons atau log. Reset kata sandi menggunakan token satu kali serta mencabut seluruh session aktif milik akun.
 
 ### 8.3 Konteks peran
 

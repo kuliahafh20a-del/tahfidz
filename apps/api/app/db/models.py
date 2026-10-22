@@ -3,6 +3,7 @@
 from sqlalchemy import MetaData
 
 from app.db.base import Base
+from app.modules.auth.models import AuthRateLimitEvent, AuthSession, PasswordRecoveryToken
 from app.modules.cohorts.models import Assignment, Cohort, Enrollment
 from app.modules.curriculum.models import (
     CurriculumVersion,
@@ -26,6 +27,9 @@ MODEL_TYPES = (
     Cohort,
     Enrollment,
     Assignment,
+    AuthSession,
+    PasswordRecoveryToken,
+    AuthRateLimitEvent,
 )
 metadata: MetaData = Base.metadata
 

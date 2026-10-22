@@ -64,7 +64,7 @@ def test_upgrade_from_empty_database_and_rollback() -> None:
                 revision = connection.scalar(
                     text("SELECT version_num FROM alembic.alembic_version")
                 )
-                assert revision == "20261022_0004"
+                assert revision == "20261022_0005"
         finally:
             engine.dispose()
 
