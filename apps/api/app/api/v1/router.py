@@ -11,6 +11,7 @@ from app.modules.calendar.router import router as participant_router
 from app.modules.cohorts.router import router as department_router
 from app.modules.curriculum.router import router as reference_router
 from app.modules.mentoring.router import router as mentoring_router
+from app.modules.video.router import router as video_router
 
 router = APIRouter(responses=ERROR_RESPONSES)
 router.include_router(auth_router)
@@ -20,6 +21,7 @@ router.include_router(participant_router)
 router.include_router(calendar_admin_router)
 router.include_router(mentoring_router)
 router.include_router(assessments_router)
+router.include_router(video_router)
 
 
 @router.get("", tags=["system"], response_model=SuccessEnvelope[dict[str, str]])
