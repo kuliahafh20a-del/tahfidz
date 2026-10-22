@@ -15,6 +15,7 @@ from app.modules.curriculum.models import (
     ThemeRange,
 )
 from app.modules.identity.models import RoleGrant, User
+from app.modules.mentoring.models import MentoringSession, SessionTheme
 from app.modules.operations.models import IdempotencyRecord
 from app.modules.organizations.models import Organization
 
@@ -32,6 +33,8 @@ MODEL_TYPES = (
     Assignment,
     Target,
     DeadlineChange,
+    MentoringSession,
+    SessionTheme,
     AuditEvent,
     AuthSession,
     PasswordRecoveryToken,

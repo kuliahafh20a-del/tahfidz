@@ -1,0 +1,103 @@
+.rules {
+  display: grid;
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--text-secondary);
+  gap: var(--space-3);
+}
+
+.supportCopy {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.themeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.themeOption {
+  display: flex;
+  align-items: flex-start;
+  padding: var(--space-3);
+  background: var(--brand-50);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.themeOption:has(input:checked) {
+  background: var(--brand-100);
+  border-color: var(--brand-700);
+}
+
+.themeOption input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--brand-700);
+}
+
+.themeOption span,
+.timeStack {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.themeOption small,
+.timeStack {
+  color: var(--text-secondary);
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.form label {
+  display: grid;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.form input,
+.form select,
+.form textarea {
+  width: 100%;
+  padding: var(--space-3);
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  font: inherit;
+}
+
+.form textarea {
+  resize: vertical;
+}
+
+.form small {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.fullField,
+.form button {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 47.9375rem) {
+  .themeGrid,
+  .form {
+    grid-template-columns: 1fr;
+  }
+
+  .fullField,
+  .form button {
+    grid-column: 1;
+  }
+}

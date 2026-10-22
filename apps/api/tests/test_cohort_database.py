@@ -16,17 +16,22 @@ from app.core.config import Settings
 from app.db.migrations import build_alembic_config
 from app.db.session import Database
 from app.modules.audit.models import AuditEvent
+from app.modules.calendar.access import ParticipantActor
 from app.modules.calendar.admin_schemas import DeadlineChangeRequest, DeadlineDecisionRequest
 from app.modules.calendar.admin_service import (
     CalendarVersionConflictError,
     DeadlineChangeService,
 )
-from app.modules.calendar.models import Target
+from app.modules.calendar.models import Target, TargetStatus
 from app.modules.calendar.service import ParticipantTargetService
 from app.modules.cohorts.access import DepartmentActor
 from app.modules.cohorts.models import AssignmentRole
 from app.modules.cohorts.schemas import AssignmentCreate
 from app.modules.cohorts.service import DepartmentProgramService, ResourceNotFoundError
+from app.modules.mentoring.access import MentorActor
+from app.modules.mentoring.models import SessionMethod, SessionStatus
+from app.modules.mentoring.schemas import SessionCreate, SessionSchedule, SessionTransition
+from app.modules.mentoring.service import MentoringSessionService, SessionVersionConflictError
 
 MIGRATION_DATABASE_URL = os.getenv("MIGRATION_TEST_DATABASE_URL")
 SAMPLE_FACULTY_ID = UUID("10000000-0000-4000-8000-000000000001")
@@ -271,7 +276,7 @@ def test_assignments_require_scoped_grant_and_preserve_history(
 ) -> None:
     first_assignment = uuid4()
     second_assignment = uuid4()
-    first_start = datetime(2027, 1, 1, tzinfo=UTC)
+    first_start = datetime(2026, 1, 1, tzinfo=UTC)
     switch_at = datetime(2027, 7, 1, tzinfo=UTC)
     with cohort_engine.connect() as connection, connection.begin():
         connection.execute(
@@ -423,6 +428,91 @@ async def assert_department_scope(
                     .values(effective_due_date=date(2027, 1, 15))
                 )
             await session.rollback()
+
+            active_targets = list(
+                await session.scalars(
+                    select(Target)
+                    .where(
+                        Target.enrollment_id == program_context["enrollment"],
+                        Target.status == TargetStatus.ACTIVE,
+                    )
+                    .order_by(Target.id)
+                    .limit(2)
+                )
+            )
+            session_service = MentoringSessionService(session)
+            participant_actor = ParticipantActor(
+                program_context["participant"], SAMPLE_DEPARTMENT_ID
+            )
+            mentor_actor = MentorActor(program_context["mentor"], SAMPLE_DEPARTMENT_ID)
+            session_proposal = await session_service.create(
+                participant_actor,
+                SessionCreate(
+                    theme_ids=[item.theme_id for item in active_targets],
+                    method=SessionMethod.VIDEO_CALL,
+                    proposed_at=datetime(2027, 2, 1, 2, tzinfo=UTC),
+                    participant_note="Fokus kelancaran ayat akhir",
+                ),
+                uuid4(),
+            )
+            await session.commit()
+            assert session_proposal.status is SessionStatus.PROPOSED
+            assert len(session_proposal.themes) == 2
+
+            scheduled = await session_service.schedule(
+                mentor_actor,
+                session_proposal.id,
+                SessionSchedule(
+                    scheduled_at=datetime(2027, 2, 1, 3, tzinfo=UTC),
+                    method=SessionMethod.VIDEO_CALL,
+                    mentor_note="Tautan dikirim terpisah",
+                    expected_version=1,
+                ),
+                uuid4(),
+            )
+            await session.commit()
+            assert scheduled.status is SessionStatus.SCHEDULED
+            assert scheduled.actual_at is None
+            assert all(item.status is TargetStatus.ACTIVE for item in active_targets)
+
+            with pytest.raises(SessionVersionConflictError):
+                await session_service.schedule(
+                    mentor_actor,
+                    session_proposal.id,
+                    SessionSchedule(
+                        scheduled_at=datetime(2027, 2, 1, 4, tzinfo=UTC),
+                        method=SessionMethod.IN_PERSON,
+                        expected_version=1,
+                    ),
+                    uuid4(),
+                )
+            started = await session_service.transition(
+                mentor_actor,
+                session_proposal.id,
+                SessionTransition(expected_version=2, note="Peserta hadir"),
+                uuid4(),
+                action="start",
+            )
+            await session.commit()
+            assert started.status is SessionStatus.IN_PROGRESS
+            assert started.actual_at is not None
+
+            completed = await session_service.transition(
+                mentor_actor,
+                session_proposal.id,
+                SessionTransition(expected_version=3, note="Sesi selesai"),
+                uuid4(),
+                action="complete",
+            )
+            await session.commit()
+            session_audits = await session.scalar(
+                select(func.count(AuditEvent.id)).where(
+                    AuditEvent.object_type == "session",
+                    AuditEvent.object_reference == str(session_proposal.id),
+                )
+            )
+            assert completed.status is SessionStatus.COMPLETED
+            assert session_audits == 4
 
             first_rotation = await service.create_assignment(
                 own_actor,

@@ -9,6 +9,7 @@ from app.modules.calendar.admin_router import router as calendar_admin_router
 from app.modules.calendar.router import router as participant_router
 from app.modules.cohorts.router import router as department_router
 from app.modules.curriculum.router import router as reference_router
+from app.modules.mentoring.router import router as mentoring_router
 
 router = APIRouter(responses=ERROR_RESPONSES)
 router.include_router(auth_router)
@@ -16,6 +17,7 @@ router.include_router(reference_router)
 router.include_router(department_router)
 router.include_router(participant_router)
 router.include_router(calendar_admin_router)
+router.include_router(mentoring_router)
 
 
 @router.get("", tags=["system"], response_model=SuccessEnvelope[dict[str, str]])
