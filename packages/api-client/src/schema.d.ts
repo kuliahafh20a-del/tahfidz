@@ -41,6 +41,95 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/department/assignments/{assignment_id}/end": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** End Assignment */
+    post: operations["end_assignment_api_v1_department_assignments__assignment_id__end_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/department/cohorts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Cohorts */
+    get: operations["list_cohorts_api_v1_department_cohorts_get"];
+    put?: never;
+    /** Create Cohort */
+    post: operations["create_cohort_api_v1_department_cohorts_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/department/enrollments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Enrollments */
+    get: operations["list_enrollments_api_v1_department_enrollments_get"];
+    put?: never;
+    /** Create Enrollment */
+    post: operations["create_enrollment_api_v1_department_enrollments_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/department/enrollments/{enrollment_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Enrollment */
+    get: operations["get_enrollment_api_v1_department_enrollments__enrollment_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update Enrollment */
+    patch: operations["update_enrollment_api_v1_department_enrollments__enrollment_id__patch"];
+    trace?: never;
+  };
+  "/api/v1/department/enrollments/{enrollment_id}/assignments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Assignments */
+    get: operations["list_assignments_api_v1_department_enrollments__enrollment_id__assignments_get"];
+    put?: never;
+    /** Create Assignment */
+    post: operations["create_assignment_api_v1_department_enrollments__enrollment_id__assignments_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/reference/assessment-rubric": {
     parameters: {
       query?: never;
@@ -157,6 +246,142 @@ export interface components {
       score: components["schemas"]["IntegerScorePolicy"];
     };
     /**
+     * AssignmentCreate
+     * @description Assign one qualified staff account and close the prior active interval.
+     */
+    AssignmentCreate: {
+      /**
+       * Assignee User Id
+       * Format: uuid
+       */
+      assignee_user_id: string;
+      /** Reason */
+      reason?: string | null;
+      role: components["schemas"]["AssignmentRole"];
+      /**
+       * Valid From
+       * Format: date-time
+       */
+      valid_from: string;
+      /** Valid To */
+      valid_to?: string | null;
+    };
+    /**
+     * AssignmentEnd
+     * @description Close an active assignment without deleting its history.
+     */
+    AssignmentEnd: {
+      /**
+       * Ended At
+       * Format: date-time
+       */
+      ended_at?: string;
+      /** Reason */
+      reason?: string | null;
+    };
+    /**
+     * AssignmentResponse
+     * @description One historical or active Mentor/Lecturer assignment.
+     */
+    AssignmentResponse: {
+      /**
+       * Enrollment Id
+       * Format: uuid
+       */
+      enrollment_id: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Reason */
+      reason: string | null;
+      role: components["schemas"]["AssignmentRole"];
+      staff: components["schemas"]["UserReference"];
+      /**
+       * Valid From
+       * Format: date-time
+       */
+      valid_from: string;
+      /** Valid To */
+      valid_to: string | null;
+    };
+    /**
+     * AssignmentRole
+     * @description Staff capacities that may be assigned to an enrollment.
+     * @enum {string}
+     */
+    AssignmentRole: "mentor" | "lecturer";
+    /**
+     * CohortCreate
+     * @description Create one department-owned cohort.
+     */
+    CohortCreate: {
+      /** Close Date */
+      close_date?: string | null;
+      /**
+       * Curriculum Version Id
+       * Format: uuid
+       */
+      curriculum_version_id: string;
+      /** Name */
+      name: string;
+      /**
+       * Policy Version Id
+       * Format: uuid
+       */
+      policy_version_id: string;
+      /**
+       * Start Date
+       * Format: date
+       */
+      start_date: string;
+      /** @default draft */
+      status: components["schemas"]["CohortStatus"];
+    };
+    /**
+     * CohortResponse
+     * @description A cohort visible inside one department scope.
+     */
+    CohortResponse: {
+      /** Close Date */
+      close_date: string | null;
+      /**
+       * Curriculum Version Id
+       * Format: uuid
+       */
+      curriculum_version_id: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Name */
+      name: string;
+      /**
+       * Organization Id
+       * Format: uuid
+       */
+      organization_id: string;
+      /**
+       * Policy Version Id
+       * Format: uuid
+       */
+      policy_version_id: string;
+      /**
+       * Start Date
+       * Format: date
+       */
+      start_date: string;
+      status: components["schemas"]["CohortStatus"];
+    };
+    /**
+     * CohortStatus
+     * @description Lifecycle states for one department program cohort.
+     * @enum {string}
+     */
+    CohortStatus: "draft" | "active" | "closed" | "archived";
+    /**
      * CurriculumResponse
      * @description The complete effective curriculum reference tree.
      */
@@ -177,6 +402,98 @@ export interface components {
       title: string;
       /** Version */
       version: string;
+    };
+    /**
+     * EnrollmentCreate
+     * @description Enroll an existing participant account in a scoped cohort.
+     */
+    EnrollmentCreate: {
+      /**
+       * Cohort Id
+       * Format: uuid
+       */
+      cohort_id: string;
+      /** Nim Snapshot */
+      nim_snapshot: string;
+      /** @default active */
+      status: components["schemas"]["EnrollmentStatus"];
+      /**
+       * User Id
+       * Format: uuid
+       */
+      user_id: string;
+    };
+    /**
+     * EnrollmentDetail
+     * @description Enrollment summary with complete assignment history.
+     */
+    EnrollmentDetail: {
+      /** Assignments */
+      assignments: components["schemas"]["AssignmentResponse"][];
+      /**
+       * Cohort Id
+       * Format: uuid
+       */
+      cohort_id: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Joined At
+       * Format: date-time
+       */
+      joined_at: string;
+      /** Nim Snapshot */
+      nim_snapshot: string;
+      status: components["schemas"]["EnrollmentStatus"];
+      user: components["schemas"]["UserReference"];
+    };
+    /**
+     * EnrollmentResponse
+     * @description Participant enrollment summary for J01.
+     */
+    EnrollmentResponse: {
+      /**
+       * Cohort Id
+       * Format: uuid
+       */
+      cohort_id: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /**
+       * Joined At
+       * Format: date-time
+       */
+      joined_at: string;
+      /** Nim Snapshot */
+      nim_snapshot: string;
+      status: components["schemas"]["EnrollmentStatus"];
+      user: components["schemas"]["UserReference"];
+    };
+    /**
+     * EnrollmentStatus
+     * @description Participant membership states within a cohort.
+     * @enum {string}
+     */
+    EnrollmentStatus: "active" | "completed" | "withdrawn" | "inactive";
+    /**
+     * EnrollmentUpdate
+     * @description Mutable enrollment fields that preserve identity and cohort history.
+     */
+    EnrollmentUpdate: {
+      /** Nim Snapshot */
+      nim_snapshot?: string | null;
+      status?: components["schemas"]["EnrollmentStatus"] | null;
+    };
+    /** HTTPValidationError */
+    HTTPValidationError: {
+      /** Detail */
+      detail?: components["schemas"]["ValidationError"][];
     };
     /**
      * IntegerScorePolicy
@@ -283,6 +600,34 @@ export interface components {
       /** Title */
       title: string;
     };
+    /**
+     * UserReference
+     * @description Minimal account information needed by the J01 workspace.
+     */
+    UserReference: {
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Login Identifier */
+      login_identifier: string;
+      /** Name */
+      name: string;
+    };
+    /** ValidationError */
+    ValidationError: {
+      /** Context */
+      ctx?: Record<string, never>;
+      /** Input */
+      input?: unknown;
+      /** Location */
+      loc: (string | number)[];
+      /** Message */
+      msg: string;
+      /** Error Type */
+      type: string;
+    };
   };
   responses: never;
   parameters: never;
@@ -332,6 +677,290 @@ export interface operations {
           "application/json": {
             [key: string]: string;
           };
+        };
+      };
+    };
+  };
+  end_assignment_api_v1_department_assignments__assignment_id__end_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        assignment_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AssignmentEnd"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssignmentResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_cohorts_api_v1_department_cohorts_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CohortResponse"][];
+        };
+      };
+    };
+  };
+  create_cohort_api_v1_department_cohorts_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CohortCreate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CohortResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_enrollments_api_v1_department_enrollments_get: {
+    parameters: {
+      query?: {
+        cohort_id?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrollmentResponse"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_enrollment_api_v1_department_enrollments_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EnrollmentCreate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrollmentResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  get_enrollment_api_v1_department_enrollments__enrollment_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        enrollment_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrollmentDetail"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  update_enrollment_api_v1_department_enrollments__enrollment_id__patch: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        enrollment_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EnrollmentUpdate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrollmentResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_assignments_api_v1_department_enrollments__enrollment_id__assignments_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        enrollment_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssignmentResponse"][];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_assignment_api_v1_department_enrollments__enrollment_id__assignments_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        enrollment_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AssignmentCreate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssignmentResponse"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
         };
       };
     };

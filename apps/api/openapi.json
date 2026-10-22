@@ -21,6 +21,258 @@
         "title": "AssessmentRubricResponse",
         "type": "object"
       },
+      "AssignmentCreate": {
+        "description": "Assign one qualified staff account and close the prior active interval.",
+        "properties": {
+          "assignee_user_id": {
+            "format": "uuid",
+            "title": "Assignee User Id",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "role": {
+            "$ref": "#/components/schemas/AssignmentRole"
+          },
+          "valid_from": {
+            "format": "date-time",
+            "title": "Valid From",
+            "type": "string"
+          },
+          "valid_to": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valid To"
+          }
+        },
+        "required": ["role", "assignee_user_id", "valid_from"],
+        "title": "AssignmentCreate",
+        "type": "object"
+      },
+      "AssignmentEnd": {
+        "description": "Close an active assignment without deleting its history.",
+        "properties": {
+          "ended_at": {
+            "format": "date-time",
+            "title": "Ended At",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "title": "AssignmentEnd",
+        "type": "object"
+      },
+      "AssignmentResponse": {
+        "description": "One historical or active Mentor/Lecturer assignment.",
+        "properties": {
+          "enrollment_id": {
+            "format": "uuid",
+            "title": "Enrollment Id",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "role": {
+            "$ref": "#/components/schemas/AssignmentRole"
+          },
+          "staff": {
+            "$ref": "#/components/schemas/UserReference"
+          },
+          "valid_from": {
+            "format": "date-time",
+            "title": "Valid From",
+            "type": "string"
+          },
+          "valid_to": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valid To"
+          }
+        },
+        "required": [
+          "id",
+          "enrollment_id",
+          "staff",
+          "role",
+          "valid_from",
+          "valid_to",
+          "reason"
+        ],
+        "title": "AssignmentResponse",
+        "type": "object"
+      },
+      "AssignmentRole": {
+        "description": "Staff capacities that may be assigned to an enrollment.",
+        "enum": ["mentor", "lecturer"],
+        "title": "AssignmentRole",
+        "type": "string"
+      },
+      "CohortCreate": {
+        "description": "Create one department-owned cohort.",
+        "properties": {
+          "close_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Close Date"
+          },
+          "curriculum_version_id": {
+            "format": "uuid",
+            "title": "Curriculum Version Id",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "policy_version_id": {
+            "format": "uuid",
+            "title": "Policy Version Id",
+            "type": "string"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CohortStatus",
+            "default": "draft"
+          }
+        },
+        "required": [
+          "curriculum_version_id",
+          "policy_version_id",
+          "name",
+          "start_date"
+        ],
+        "title": "CohortCreate",
+        "type": "object"
+      },
+      "CohortResponse": {
+        "description": "A cohort visible inside one department scope.",
+        "properties": {
+          "close_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Close Date"
+          },
+          "curriculum_version_id": {
+            "format": "uuid",
+            "title": "Curriculum Version Id",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "title": "Organization Id",
+            "type": "string"
+          },
+          "policy_version_id": {
+            "format": "uuid",
+            "title": "Policy Version Id",
+            "type": "string"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CohortStatus"
+          }
+        },
+        "required": [
+          "id",
+          "organization_id",
+          "curriculum_version_id",
+          "policy_version_id",
+          "name",
+          "start_date",
+          "close_date",
+          "status"
+        ],
+        "title": "CohortResponse",
+        "type": "object"
+      },
+      "CohortStatus": {
+        "description": "Lifecycle states for one department program cohort.",
+        "enum": ["draft", "active", "closed", "archived"],
+        "title": "CohortStatus",
+        "type": "string"
+      },
       "CurriculumResponse": {
         "description": "The complete effective curriculum reference tree.",
         "properties": {
@@ -52,6 +304,171 @@
         },
         "required": ["id", "version", "title", "published_at", "parts"],
         "title": "CurriculumResponse",
+        "type": "object"
+      },
+      "EnrollmentCreate": {
+        "description": "Enroll an existing participant account in a scoped cohort.",
+        "properties": {
+          "cohort_id": {
+            "format": "uuid",
+            "title": "Cohort Id",
+            "type": "string"
+          },
+          "nim_snapshot": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Nim Snapshot",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EnrollmentStatus",
+            "default": "active"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": ["user_id", "cohort_id", "nim_snapshot"],
+        "title": "EnrollmentCreate",
+        "type": "object"
+      },
+      "EnrollmentDetail": {
+        "description": "Enrollment summary with complete assignment history.",
+        "properties": {
+          "assignments": {
+            "items": {
+              "$ref": "#/components/schemas/AssignmentResponse"
+            },
+            "title": "Assignments",
+            "type": "array"
+          },
+          "cohort_id": {
+            "format": "uuid",
+            "title": "Cohort Id",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "joined_at": {
+            "format": "date-time",
+            "title": "Joined At",
+            "type": "string"
+          },
+          "nim_snapshot": {
+            "title": "Nim Snapshot",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EnrollmentStatus"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserReference"
+          }
+        },
+        "required": [
+          "id",
+          "cohort_id",
+          "user",
+          "nim_snapshot",
+          "status",
+          "joined_at",
+          "assignments"
+        ],
+        "title": "EnrollmentDetail",
+        "type": "object"
+      },
+      "EnrollmentResponse": {
+        "description": "Participant enrollment summary for J01.",
+        "properties": {
+          "cohort_id": {
+            "format": "uuid",
+            "title": "Cohort Id",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "joined_at": {
+            "format": "date-time",
+            "title": "Joined At",
+            "type": "string"
+          },
+          "nim_snapshot": {
+            "title": "Nim Snapshot",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EnrollmentStatus"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserReference"
+          }
+        },
+        "required": [
+          "id",
+          "cohort_id",
+          "user",
+          "nim_snapshot",
+          "status",
+          "joined_at"
+        ],
+        "title": "EnrollmentResponse",
+        "type": "object"
+      },
+      "EnrollmentStatus": {
+        "description": "Participant membership states within a cohort.",
+        "enum": ["active", "completed", "withdrawn", "inactive"],
+        "title": "EnrollmentStatus",
+        "type": "string"
+      },
+      "EnrollmentUpdate": {
+        "description": "Mutable enrollment fields that preserve identity and cohort history.",
+        "properties": {
+          "nim_snapshot": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nim Snapshot"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EnrollmentStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "EnrollmentUpdate",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
         "type": "object"
       },
       "IntegerScorePolicy": {
@@ -226,6 +643,63 @@
         "required": ["sequence_no", "title", "description", "ranges"],
         "title": "ThemeResponse",
         "type": "object"
+      },
+      "UserReference": {
+        "description": "Minimal account information needed by the J01 workspace.",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "login_identifier": {
+            "title": "Login Identifier",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": ["id", "name", "login_identifier"],
+        "title": "UserReference",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError",
+        "type": "object"
       }
     }
   },
@@ -281,6 +755,390 @@
         },
         "summary": "Api Version",
         "tags": ["system"]
+      }
+    },
+    "/api/v1/department/assignments/{assignment_id}/end": {
+      "post": {
+        "operationId": "end_assignment_api_v1_department_assignments__assignment_id__end_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "assignment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Assignment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignmentEnd"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignmentResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "End Assignment",
+        "tags": ["department administration"]
+      }
+    },
+    "/api/v1/department/cohorts": {
+      "get": {
+        "operationId": "list_cohorts_api_v1_department_cohorts_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CohortResponse"
+                  },
+                  "title": "Response List Cohorts Api V1 Department Cohorts Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Cohorts",
+        "tags": ["department administration"]
+      },
+      "post": {
+        "operationId": "create_cohort_api_v1_department_cohorts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CohortCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CohortResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Cohort",
+        "tags": ["department administration"]
+      }
+    },
+    "/api/v1/department/enrollments": {
+      "get": {
+        "operationId": "list_enrollments_api_v1_department_enrollments_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cohort_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cohort Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EnrollmentResponse"
+                  },
+                  "title": "Response List Enrollments Api V1 Department Enrollments Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Enrollments",
+        "tags": ["department administration"]
+      },
+      "post": {
+        "operationId": "create_enrollment_api_v1_department_enrollments_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollmentCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrollmentResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Enrollment",
+        "tags": ["department administration"]
+      }
+    },
+    "/api/v1/department/enrollments/{enrollment_id}": {
+      "get": {
+        "operationId": "get_enrollment_api_v1_department_enrollments__enrollment_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enrollment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Enrollment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrollmentDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Enrollment",
+        "tags": ["department administration"]
+      },
+      "patch": {
+        "operationId": "update_enrollment_api_v1_department_enrollments__enrollment_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enrollment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Enrollment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollmentUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrollmentResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Enrollment",
+        "tags": ["department administration"]
+      }
+    },
+    "/api/v1/department/enrollments/{enrollment_id}/assignments": {
+      "get": {
+        "operationId": "list_assignments_api_v1_department_enrollments__enrollment_id__assignments_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enrollment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Enrollment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AssignmentResponse"
+                  },
+                  "title": "Response List Assignments Api V1 Department Enrollments  Enrollment Id  Assignments Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Assignments",
+        "tags": ["department administration"]
+      },
+      "post": {
+        "operationId": "create_assignment_api_v1_department_enrollments__enrollment_id__assignments_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "enrollment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Enrollment Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignmentCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssignmentResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Assignment",
+        "tags": ["department administration"]
       }
     },
     "/api/v1/reference/assessment-rubric": {

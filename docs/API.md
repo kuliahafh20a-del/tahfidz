@@ -801,6 +801,7 @@ Perubahan petugas tidak menimpa assignment lama. Server mengakhiri interval lama
 | Method | Endpoint | Tujuan |
 |---|---|---|
 | GET | `/department/cohorts` | Daftar angkatan |
+| POST | `/department/cohorts` | Membuat angkatan dalam lingkup jurusan aktif |
 | GET | `/department/cohorts/{cohort_id}/calendar` | Kalender 52 pekan dan 44 target |
 | POST | `/department/cohorts/{cohort_id}/deadline-changes` | Mengajukan perubahan tenggat |
 | POST | `/department/deadline-changes/{change_id}/approve` | Menyetujui sesuai mandat |
