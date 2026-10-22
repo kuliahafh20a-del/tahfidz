@@ -95,7 +95,7 @@ def test_reference_endpoints_expose_effective_versions() -> None:
         curriculum = client.get("/api/v1/reference/curriculum")
 
     assert rubric.status_code == 200
-    assert rubric.json()["score"] == {
+    assert rubric.json()["data"]["score"] == {
         "minimum": 1,
         "maximum": 10,
         "step": 1,
@@ -108,9 +108,9 @@ def test_reference_endpoints_expose_effective_versions() -> None:
         ],
     }
     assert policy.status_code == 200
-    assert policy.json()["version"] == "2026.1"
+    assert policy.json()["data"]["version"] == "2026.1"
     assert curriculum.status_code == 200
-    assert curriculum.json()["parts"][0]["themes"][0]["ranges"][0] == {
+    assert curriculum.json()["data"]["parts"][0]["themes"][0]["ranges"][0] == {
         "sequence_no": 1,
         "surah_no": 78,
         "ayah_start": 1,
@@ -123,4 +123,5 @@ def test_reference_endpoint_returns_stable_not_found_error() -> None:
         response = client.get("/api/v1/reference/curriculum")
 
     assert response.status_code == 404
-    assert response.json() == {"detail": {"code": "reference_not_available"}}
+    assert response.json()["code"] == "REFERENCE_NOT_AVAILABLE"
+    assert response.json()["request_id"] == response.headers["x-request-id"]

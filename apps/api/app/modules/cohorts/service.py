@@ -6,6 +6,7 @@ from sqlalchemy import Select, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from sqlalchemy.orm.exc import StaleDataError
 
 from app.modules.cohorts.access import DepartmentActor
 from app.modules.cohorts.models import Assignment, Cohort, Enrollment
@@ -28,6 +29,14 @@ class ResourceNotFoundError(LookupError):
 
 class DomainConflictError(ValueError):
     """Report a uniqueness, interval, or role-capacity conflict."""
+
+
+class VersionConflictError(DomainConflictError):
+    """Reject stale mutation payloads without overwriting newer data."""
+
+    def __init__(self, current_version: int) -> None:
+        super().__init__("enrollment was updated by another request")
+        self.current_version = current_version
 
 
 class DepartmentProgramService:
@@ -107,9 +116,26 @@ class DepartmentProgramService:
         )
         if enrollment is None:
             raise ResourceNotFoundError("enrollment not found")
-        for field, value in payload.model_dump(exclude_none=True).items():
+        if payload.expected_version != enrollment.row_version:
+            raise VersionConflictError(enrollment.row_version)
+        for field, value in payload.model_dump(
+            exclude={"expected_version"},
+            exclude_none=True,
+        ).items():
             setattr(enrollment, field, value)
-        await self._commit("enrollment update conflicts with an existing participant or NIM")
+        try:
+            await self.session.commit()
+        except StaleDataError as error:
+            await self.session.rollback()
+            current_version = await self.session.scalar(
+                select(Enrollment.row_version).where(Enrollment.id == enrollment_id)
+            )
+            raise VersionConflictError(current_version or payload.expected_version) from error
+        except IntegrityError as error:
+            await self.session.rollback()
+            raise DomainConflictError(
+                "enrollment update conflicts with an existing participant or NIM"
+            ) from error
         return await self._enrollment_response(actor, enrollment.id)
 
     async def list_assignments(

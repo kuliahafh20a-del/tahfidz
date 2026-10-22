@@ -39,14 +39,18 @@ def test_readiness_hides_database_failure(monkeypatch: pytest.MonkeyPatch) -> No
         response = readiness_client.get("/health/ready")
 
     assert response.status_code == 503
-    assert response.json() == {"detail": {"status": "not_ready"}}
+    assert response.json()["code"] == "SERVICE_UNAVAILABLE"
+    assert response.json()["request_id"] == response.headers["x-request-id"]
 
 
 def test_versioned_api_root() -> None:
     response = client.get("/api/v1")
 
     assert response.status_code == 200
-    assert response.json() == {"name": "YAQin API", "version": "v1"}
+    assert response.json()["data"] == {"name": "YAQin API", "version": "v1"}
+    assert response.json()["version"] is None
+    assert response.json()["request_id"] == response.headers["x-request-id"]
+    assert response.headers["cache-control"] == "no-store"
 
 
 def test_openapi_contains_bootstrap_routes() -> None:

@@ -34,9 +34,27 @@ type Enrollment = {
   nim_snapshot: string;
   status: "active" | "completed" | "withdrawn" | "inactive";
   joined_at: string;
+  row_version: number;
 };
 
 type EnrollmentDetail = Enrollment & { assignments: Assignment[] };
+
+type ApiEnvelope<T> = {
+  data: T;
+  request_id: string;
+  version: number | null;
+};
+
+type ApiError = {
+  code?: string;
+  message?: string;
+  request_id?: string;
+};
+
+type CursorPage<T> = {
+  items: T[];
+  page: { has_more: boolean; next_cursor: string | null };
+};
 
 const apiRoot = "/api/v1";
 
@@ -47,12 +65,11 @@ async function apiRequest<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
   });
   if (!response.ok) {
-    const error = (await response.json().catch(() => null)) as {
-      detail?: { code?: string; message?: string };
-    } | null;
-    throw new Error(error?.detail?.message ?? error?.detail?.code ?? "Permintaan gagal diproses.");
+    const error = (await response.json().catch(() => null)) as ApiError | null;
+    throw new Error(error?.message ?? error?.code ?? "Permintaan gagal diproses.");
   }
-  return (await response.json()) as T;
+  const envelope = (await response.json()) as ApiEnvelope<T>;
+  return envelope.data;
 }
 
 function dateLabel(value: string | null): string {
@@ -67,10 +84,10 @@ async function loadWorkspace(): Promise<{
 }> {
   const [session, cohorts, enrollments] = await Promise.all([
     apiRequest<{ csrf_token: string }>("/auth/session"),
-    apiRequest<Cohort[]>("/department/cohorts"),
-    apiRequest<Enrollment[]>("/department/enrollments"),
+    apiRequest<CursorPage<Cohort>>("/department/cohorts"),
+    apiRequest<CursorPage<Enrollment>>("/department/enrollments"),
   ]);
-  return { cohorts, enrollments, csrfToken: session.csrf_token };
+  return { cohorts: cohorts.items, enrollments: enrollments.items, csrfToken: session.csrf_token };
 }
 
 export function ParticipantAssignmentWorkspace() {
@@ -124,7 +141,7 @@ export function ParticipantAssignmentWorkspace() {
       if (csrfToken === null) throw new Error("Session belum siap. Muat ulang halaman.");
       await apiRequest<Enrollment>("/department/enrollments", {
         method: "POST",
-        headers: { "X-CSRF-Token": csrfToken },
+        headers: { "Idempotency-Key": crypto.randomUUID(), "X-CSRF-Token": csrfToken },
         body: JSON.stringify({
           user_id: form.get("user_id"),
           cohort_id: form.get("cohort_id"),

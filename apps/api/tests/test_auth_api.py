@@ -140,7 +140,7 @@ def test_login_sets_secure_opaque_cookie_and_no_store_response() -> None:
     assert "Secure" in cookie
     assert "SameSite=lax" in cookie
     assert response.headers["cache-control"] == "no-store"
-    assert response.json()["csrf_token"] == "session-bound-csrf"
+    assert response.json()["data"]["csrf_token"] == "session-bound-csrf"
 
 
 def test_login_failure_is_generic_and_rate_limit_sets_retry_after() -> None:
@@ -162,7 +162,8 @@ def test_login_failure_is_generic_and_rate_limit_sets_retry_after() -> None:
         )
 
     assert missing.status_code == existing.status_code == 401
-    assert missing.json() == existing.json()
+    assert missing.json()["code"] == existing.json()["code"] == "INVALID_CREDENTIALS"
+    assert missing.json()["message"] == existing.json()["message"]
     assert limited.status_code == 429
     assert limited.headers["retry-after"] == "900"
 
@@ -200,6 +201,6 @@ def test_recovery_response_is_identical_and_token_only_reaches_delivery_boundary
         )
 
     assert missing.status_code == existing.status_code == 202
-    assert missing.json() == existing.json()
+    assert missing.json()["data"] == existing.json()["data"]
     assert "secret-recovery-token" not in existing.text
     assert delivery.delivered == [service.recovery_challenge]

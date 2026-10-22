@@ -12,6 +12,18 @@ type SessionPayload = {
   active_context: { role: string; organization_id: string } | null;
 };
 
+type ApiEnvelope<T> = {
+  data: T;
+  request_id: string;
+  version: number | null;
+};
+
+type ApiError = {
+  code?: string;
+  message?: string;
+  request_id?: string;
+};
+
 async function postJson<T>(path: string, body: object): Promise<T> {
   const response = await fetch(`/api/v1/auth${path}`, {
     method: "POST",
@@ -19,16 +31,12 @@ async function postJson<T>(path: string, body: object): Promise<T> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  const payload = (await response.json().catch(() => null)) as
-    T | { detail?: { message?: string; code?: string } } | null;
+  const payload = (await response.json().catch(() => null)) as ApiEnvelope<T> | ApiError | null;
   if (!response.ok) {
-    const detail =
-      typeof payload === "object" && payload !== null && "detail" in payload
-        ? payload.detail
-        : undefined;
-    throw new Error(detail?.message ?? detail?.code ?? "Permintaan tidak dapat diproses.");
+    const error = payload as ApiError | null;
+    throw new Error(error?.message ?? error?.code ?? "Permintaan tidak dapat diproses.");
   }
-  return payload as T;
+  return (payload as ApiEnvelope<T>).data;
 }
 
 export function AuthCard({ mode }: { mode: AuthMode }) {

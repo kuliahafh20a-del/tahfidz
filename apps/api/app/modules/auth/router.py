@@ -4,6 +4,7 @@ from typing import Annotated, NoReturn
 
 from fastapi import APIRouter, Cookie, Depends, Header, HTTPException, Request, Response, status
 
+from app.api.contracts import SuccessEnvelope, success
 from app.core.config import Settings, get_settings
 from app.modules.auth.access import SESSION_COOKIE_NAME
 from app.modules.auth.delivery import RecoveryTokenDeliveryDependency
@@ -100,45 +101,47 @@ def _raise_auth_error(error: Exception) -> NoReturn:
     ) from error
 
 
-@router.post("/login", response_model=SessionResponse)
+@router.post("/login", response_model=SuccessEnvelope[SessionResponse])
 async def login(
     payload: LoginRequest,
     request: Request,
     response: Response,
     service: AuthServiceDependency,
     settings: SettingsDependency,
-) -> SessionResponse:
+) -> SuccessEnvelope[SessionResponse]:
     try:
         issued = await service.login(payload.identifier, payload.password, _client_address(request))
     except (InvalidCredentialsError, RateLimitExceededError) as error:
         _raise_auth_error(error)
     _set_session_cookie(response, issued, settings)
-    return issued.payload
+    return success(request, issued.payload)
 
 
-@router.get("/session", response_model=SessionResponse)
+@router.get("/session", response_model=SuccessEnvelope[SessionResponse])
 async def read_session(
+    request: Request,
     response: Response,
     service: AuthServiceDependency,
     session_token: Annotated[str | None, Cookie(alias=SESSION_COOKIE_NAME)] = None,
-) -> SessionResponse:
+) -> SuccessEnvelope[SessionResponse]:
     try:
         payload = await service.session_payload(session_token)
     except AuthenticationRequiredError as error:
         _raise_auth_error(error)
     response.headers["Cache-Control"] = "no-store"
-    return payload
+    return success(request, payload)
 
 
-@router.post("/session/rotate", response_model=SessionResponse)
+@router.post("/session/rotate", response_model=SuccessEnvelope[SessionResponse])
 async def rotate_session(
     payload: SessionRotateRequest,
+    request: Request,
     response: Response,
     service: AuthServiceDependency,
     settings: SettingsDependency,
     session_token: Annotated[str | None, Cookie(alias=SESSION_COOKIE_NAME)] = None,
     csrf_token: Annotated[str | None, Header(alias="X-CSRF-Token")] = None,
-) -> SessionResponse:
+) -> SuccessEnvelope[SessionResponse]:
     try:
         issued = await service.rotate(session_token, csrf_token, payload.active_context)
     except (
@@ -148,7 +151,7 @@ async def rotate_session(
     ) as error:
         _raise_auth_error(error)
     _set_session_cookie(response, issued, settings)
-    return issued.payload
+    return success(request, issued.payload)
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
@@ -168,7 +171,7 @@ async def logout(
 
 @router.post(
     "/password-recovery",
-    response_model=GenericAuthResponse,
+    response_model=SuccessEnvelope[GenericAuthResponse],
     status_code=status.HTTP_202_ACCEPTED,
 )
 async def request_password_recovery(
@@ -177,7 +180,7 @@ async def request_password_recovery(
     response: Response,
     service: AuthServiceDependency,
     delivery: RecoveryTokenDeliveryDependency,
-) -> GenericAuthResponse:
+) -> SuccessEnvelope[GenericAuthResponse]:
     try:
         challenge = await service.request_password_recovery(
             payload.identifier,
@@ -188,19 +191,22 @@ async def request_password_recovery(
     if challenge is not None:
         await delivery.deliver(challenge)
     response.headers["Cache-Control"] = "no-store"
-    return GenericAuthResponse(message=GENERIC_RECOVERY_MESSAGE)
+    return success(request, GenericAuthResponse(message=GENERIC_RECOVERY_MESSAGE))
 
 
-@router.post("/password-reset", response_model=GenericAuthResponse)
+@router.post("/password-reset", response_model=SuccessEnvelope[GenericAuthResponse])
 async def reset_password(
     payload: PasswordResetRequest,
     request: Request,
     response: Response,
     service: AuthServiceDependency,
-) -> GenericAuthResponse:
+) -> SuccessEnvelope[GenericAuthResponse]:
     try:
         await service.reset_password(payload.token, payload.new_password, _client_address(request))
     except (RecoveryTokenInvalidError, RateLimitExceededError) as error:
         _raise_auth_error(error)
     response.headers["Cache-Control"] = "no-store"
-    return GenericAuthResponse(message="Kata sandi berhasil diperbarui. Silakan masuk kembali.")
+    return success(
+        request,
+        GenericAuthResponse(message="Kata sandi berhasil diperbarui. Silakan masuk kembali."),
+    )
