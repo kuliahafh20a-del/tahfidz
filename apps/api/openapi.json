@@ -357,6 +357,58 @@
         "title": "CursorPage[EnrollmentResponse]",
         "type": "object"
       },
+      "CursorPage_TargetResponse_": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TargetResponse"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        },
+        "required": ["items", "page"],
+        "title": "CursorPage[TargetResponse]",
+        "type": "object"
+      },
+      "DashboardResponse": {
+        "properties": {
+          "next_target": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TargetResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "participant": {
+            "$ref": "#/components/schemas/ParticipantSummary"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/ProgressResponse"
+          },
+          "upcoming_targets": {
+            "items": {
+              "$ref": "#/components/schemas/TargetResponse"
+            },
+            "title": "Upcoming Targets",
+            "type": "array"
+          }
+        },
+        "required": [
+          "participant",
+          "progress",
+          "next_target",
+          "upcoming_targets"
+        ],
+        "title": "DashboardResponse",
+        "type": "object"
+      },
       "EnrollmentCreate": {
         "description": "Enroll an existing participant account in a scoped cohort.",
         "properties": {
@@ -656,6 +708,56 @@
         "title": "PageMetadata",
         "type": "object"
       },
+      "PartProgress": {
+        "properties": {
+          "completed_targets": {
+            "title": "Completed Targets",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "locked_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locked Reason"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "part_no": {
+            "title": "Part No",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "total_targets": {
+            "title": "Total Targets",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "part_no",
+          "name",
+          "total_targets",
+          "completed_targets",
+          "status"
+        ],
+        "title": "PartProgress",
+        "type": "object"
+      },
       "PartResponse": {
         "description": "One ordered curriculum part.",
         "properties": {
@@ -677,6 +779,55 @@
         },
         "required": ["sequence_no", "title", "themes"],
         "title": "PartResponse",
+        "type": "object"
+      },
+      "ParticipantSummary": {
+        "properties": {
+          "cohort_close_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cohort Close Date"
+          },
+          "cohort_name": {
+            "title": "Cohort Name",
+            "type": "string"
+          },
+          "cohort_start_date": {
+            "format": "date",
+            "title": "Cohort Start Date",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "enrollment_id": {
+            "format": "uuid",
+            "title": "Enrollment Id",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "display_name",
+          "enrollment_id",
+          "cohort_name",
+          "cohort_start_date",
+          "cohort_close_date"
+        ],
+        "title": "ParticipantSummary",
         "type": "object"
       },
       "PasswordRecoveryRequest": {
@@ -735,6 +886,76 @@
         },
         "required": ["id", "version", "status", "effective_from"],
         "title": "PolicySummary",
+        "type": "object"
+      },
+      "ProgressResponse": {
+        "properties": {
+          "active_part": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PartProgress"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "completed_targets": {
+            "title": "Completed Targets",
+            "type": "integer"
+          },
+          "completion_percentage": {
+            "title": "Completion Percentage",
+            "type": "number"
+          },
+          "expected_completed_targets": {
+            "title": "Expected Completed Targets",
+            "type": "integer"
+          },
+          "on_track": {
+            "title": "On Track",
+            "type": "boolean"
+          },
+          "overdue_targets": {
+            "title": "Overdue Targets",
+            "type": "integer"
+          },
+          "parts": {
+            "items": {
+              "$ref": "#/components/schemas/PartProgress"
+            },
+            "title": "Parts",
+            "type": "array"
+          },
+          "projected_completion_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Projected Completion Date"
+          },
+          "total_targets": {
+            "title": "Total Targets",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total_targets",
+          "completed_targets",
+          "overdue_targets",
+          "expected_completed_targets",
+          "completion_percentage",
+          "on_track",
+          "projected_completion_date",
+          "active_part",
+          "parts"
+        ],
+        "title": "ProgressResponse",
         "type": "object"
       },
       "Role": {
@@ -1062,6 +1283,58 @@
         "title": "SuccessEnvelope[CursorPage[EnrollmentResponse]]",
         "type": "object"
       },
+      "SuccessEnvelope_CursorPage_TargetResponse__": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CursorPage_TargetResponse_"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "required": ["data", "request_id"],
+        "title": "SuccessEnvelope[CursorPage[TargetResponse]]",
+        "type": "object"
+      },
+      "SuccessEnvelope_DashboardResponse_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DashboardResponse"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "required": ["data", "request_id"],
+        "title": "SuccessEnvelope[DashboardResponse]",
+        "type": "object"
+      },
       "SuccessEnvelope_EnrollmentDetail_": {
         "properties": {
           "data": {
@@ -1166,6 +1439,32 @@
         "title": "SuccessEnvelope[PolicySummary]",
         "type": "object"
       },
+      "SuccessEnvelope_ProgressResponse_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ProgressResponse"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "required": ["data", "request_id"],
+        "title": "SuccessEnvelope[ProgressResponse]",
+        "type": "object"
+      },
       "SuccessEnvelope_SessionResponse_": {
         "properties": {
           "data": {
@@ -1220,6 +1519,121 @@
         },
         "required": ["data", "request_id"],
         "title": "SuccessEnvelope[dict[str, str]]",
+        "type": "object"
+      },
+      "TargetResponse": {
+        "properties": {
+          "activity_score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activity Score"
+          },
+          "allowed_actions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Allowed Actions",
+            "type": "array"
+          },
+          "effective_due_date": {
+            "format": "date",
+            "title": "Effective Due Date",
+            "type": "string"
+          },
+          "first_valid_submission_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Valid Submission At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "initial_due_date": {
+            "format": "date",
+            "title": "Initial Due Date",
+            "type": "string"
+          },
+          "locked_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locked Reason"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TargetStatus"
+          },
+          "theme": {
+            "$ref": "#/components/schemas/TargetTheme"
+          }
+        },
+        "required": [
+          "id",
+          "theme",
+          "initial_due_date",
+          "effective_due_date",
+          "status",
+          "allowed_actions"
+        ],
+        "title": "TargetResponse",
+        "type": "object"
+      },
+      "TargetStatus": {
+        "description": "Lifecycle states for one participant-theme target.",
+        "enum": ["scheduled", "active", "completed", "closed"],
+        "title": "TargetStatus",
+        "type": "string"
+      },
+      "TargetTheme": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "part_id": {
+            "format": "uuid",
+            "title": "Part Id",
+            "type": "string"
+          },
+          "part_name": {
+            "title": "Part Name",
+            "type": "string"
+          },
+          "part_no": {
+            "title": "Part No",
+            "type": "integer"
+          }
+        },
+        "required": ["id", "code", "name", "part_id", "part_no", "part_name"],
+        "title": "TargetTheme",
         "type": "object"
       },
       "ThemeRangeResponse": {
@@ -3660,6 +4074,484 @@
         },
         "summary": "Create Assignment",
         "tags": ["department administration"]
+      }
+    },
+    "/api/v1/me/dashboard": {
+      "get": {
+        "operationId": "dashboard_api_v1_me_dashboard_get",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "yaqin_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Yaqin Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessEnvelope_DashboardResponse_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Dashboard",
+        "tags": ["participant"]
+      }
+    },
+    "/api/v1/me/progress": {
+      "get": {
+        "operationId": "progress_api_v1_me_progress_get",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "yaqin_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Yaqin Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessEnvelope_ProgressResponse_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Progress",
+        "tags": ["participant"]
+      }
+    },
+    "/api/v1/me/targets": {
+      "get": {
+        "operationId": "targets_api_v1_me_targets_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "part_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Part Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/TargetStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "due_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Due From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "due_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Due To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 2048,
+                  "minLength": 16,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "yaqin_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Yaqin Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessEnvelope_CursorPage_TargetResponse__"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Targets",
+        "tags": ["participant"]
       }
     },
     "/api/v1/reference/assessment-rubric": {

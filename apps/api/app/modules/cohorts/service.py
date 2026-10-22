@@ -103,6 +103,9 @@ class DepartmentProgramService:
         enrollment = Enrollment(**payload.model_dump())
         self.session.add(enrollment)
         await self._commit("participant or NIM is already enrolled in this cohort")
+        from app.modules.calendar.service import ParticipantTargetService
+
+        await ParticipantTargetService(self.session).generate_for_enrollment(enrollment.id)
         return await self._enrollment_response(actor, enrollment.id)
 
     async def update_enrollment(
