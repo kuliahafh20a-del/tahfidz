@@ -24,6 +24,7 @@ from app.modules.calendar.service import (
     ParticipantEnrollmentNotFoundError,
     ParticipantTargetService,
 )
+from app.modules.grading.schemas import ActivityScoreResponse
 
 router = APIRouter(prefix="/me", tags=["participant"])
 
@@ -82,6 +83,21 @@ async def progress(
     _no_store(response)
     try:
         return success(request, await service.progress(actor))
+    except ParticipantEnrollmentNotFoundError as error:
+        _not_found(error)
+
+
+@router.get("/activity-score", response_model=SuccessEnvelope[ActivityScoreResponse])
+async def activity_score(
+    request: Request,
+    response: Response,
+    actor: ParticipantActorDependency,
+    service: ParticipantTargetServiceDependency,
+) -> SuccessEnvelope[ActivityScoreResponse]:
+    require_query_allowlist(request, set())
+    _no_store(response)
+    try:
+        return success(request, await service.activity_score(actor))
     except ParticipantEnrollmentNotFoundError as error:
         _not_found(error)
 

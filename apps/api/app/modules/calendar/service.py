@@ -23,6 +23,8 @@ from app.modules.calendar.schemas import (
 )
 from app.modules.cohorts.models import Cohort, Enrollment, EnrollmentStatus
 from app.modules.curriculum.models import Part, Theme
+from app.modules.grading.schemas import ActivityScoreResponse, ActivityThemeScore
+from app.modules.grading.service import ActivityScoreService
 
 
 class ParticipantEnrollmentNotFoundError(LookupError):
@@ -93,7 +95,7 @@ class ParticipantTargetService:
         enrollment = await self._active_enrollment(actor)
         await self.generate_for_enrollment(enrollment.id)
         records = await self._target_records(enrollment.id)
-        responses = self._target_responses(records)
+        responses = await self._target_responses_with_activity(enrollment, records)
         return [
             item
             for item in responses
@@ -106,12 +108,14 @@ class ParticipantTargetService:
     async def progress(self, actor: ParticipantActor) -> ProgressResponse:
         enrollment = await self._active_enrollment(actor)
         await self.generate_for_enrollment(enrollment.id)
-        return self._progress(self._target_responses(await self._target_records(enrollment.id)))
+        records = await self._target_records(enrollment.id)
+        return self._progress(await self._target_responses_with_activity(enrollment, records))
 
     async def dashboard(self, actor: ParticipantActor) -> DashboardResponse:
         enrollment = await self._active_enrollment(actor)
         await self.generate_for_enrollment(enrollment.id)
-        targets = self._target_responses(await self._target_records(enrollment.id))
+        records = await self._target_records(enrollment.id)
+        targets = await self._target_responses_with_activity(enrollment, records)
         actionable = [item for item in targets if item.allowed_actions]
         upcoming = [
             item for item in targets if item.status in {TargetStatus.ACTIVE, TargetStatus.SCHEDULED}
@@ -129,6 +133,11 @@ class ParticipantTargetService:
             next_target=actionable[0] if actionable else None,
             upcoming_targets=upcoming,
         )
+
+    async def activity_score(self, actor: ParticipantActor) -> ActivityScoreResponse:
+        enrollment = await self._active_enrollment(actor)
+        await self.generate_for_enrollment(enrollment.id)
+        return await ActivityScoreService(self.session).for_enrollment(enrollment)
 
     async def _active_enrollment(self, actor: ParticipantActor) -> Enrollment:
         enrollment = await self.session.scalar(
@@ -158,7 +167,19 @@ class ParticipantTargetService:
             )
         )
 
-    def _target_responses(self, targets: list[Target]) -> list[TargetResponse]:
+    async def _target_responses_with_activity(
+        self, enrollment: Enrollment, targets: list[Target]
+    ) -> list[TargetResponse]:
+        activity = await ActivityScoreService(self.session).for_enrollment(enrollment)
+        activity_by_theme = {item.theme_id: item for item in activity.source_context.themes}
+        return self._target_responses(targets, activity_by_theme=activity_by_theme)
+
+    def _target_responses(
+        self,
+        targets: list[Target],
+        *,
+        activity_by_theme: dict[UUID, ActivityThemeScore] | None = None,
+    ) -> list[TargetResponse]:
         if not targets:
             return []
         active_part_no = next(
@@ -171,6 +192,7 @@ class ParticipantTargetService:
 
         responses: list[TargetResponse] = []
         for ordinal, target in enumerate(targets, start=1):
+            activity = (activity_by_theme or {}).get(target.theme_id)
             part_no = target.theme.part.sequence_no
             locked_reason = None
             allowed_actions: list[str] = []
@@ -198,6 +220,10 @@ class ParticipantTargetService:
                     initial_due_date=target.initial_due_date,
                     effective_due_date=target.effective_due_date,
                     status=target.status,
+                    first_valid_submission_at=(
+                        activity.first_valid_submission_at if activity is not None else None
+                    ),
+                    activity_score=activity.score if activity is not None else None,
                     locked_reason=locked_reason,
                     allowed_actions=allowed_actions,
                 )

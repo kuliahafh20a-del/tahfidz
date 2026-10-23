@@ -599,9 +599,12 @@ async def assert_department_scope(
 
             repeat_theme = await session.get(Theme, active_targets[1].theme_id)
             assert repeat_theme is not None
+            assert started.actual_at is not None
             repeat_session_ids = [session_proposal.id]
+            repeat_actual_times = [started.actual_at]
             for _index in range(4):
                 actual_at = datetime.now(UTC)
+                repeat_actual_times.append(actual_at)
                 repeat_session = MentoringSession(
                     enrollment_id=program_context["enrollment"],
                     part_id=repeat_theme.part_id,
@@ -650,6 +653,15 @@ async def assert_department_scope(
             assert fifth_result is not None
             assert fifth_result.attempt_no == 5
             assert fifth_result.outcome is ThemeOutcome.FOLLOW_UP
+
+            activity = await targets.activity_score(participant_actor)
+            repeat_activity = next(
+                item
+                for item in activity.source_context.themes
+                if item.theme_id == active_targets[1].theme_id
+            )
+            assert repeat_activity.first_valid_submission_at == min(repeat_actual_times)
+            assert repeat_activity.score == 10
 
             sixth_time = datetime.now(UTC)
             sixth_session = MentoringSession(
