@@ -25,6 +25,8 @@ SETTINGS = Settings.model_validate(
         "DATABASE_URL": "postgresql://yaqin:a-real-test-password@localhost/yaqin",
         "SESSION_SECRET": "test-session-key-with-more-than-thirty-two-characters",
         "CSRF_SECRET": "test-csrf-key-with-more-than-thirty-two-characters",
+        "OBJECT_STORAGE_ACCESS_KEY": "test-storage-access",
+        "OBJECT_STORAGE_SECRET_KEY": "test-storage-secret",
     }
 )
 

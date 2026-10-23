@@ -3,6 +3,7 @@
 from enum import StrEnum
 from functools import lru_cache
 from typing import Literal, Self
+from urllib.parse import urlsplit, urlunsplit
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from pydantic import Field, SecretStr, field_validator, model_validator
@@ -107,6 +108,66 @@ class Settings(BaseSettings):
         min_length=1,
         alias="VIDEO_ALLOWED_HOSTS",
     )
+    object_storage_endpoint: str = Field(
+        default="http://object-storage:9000",
+        alias="OBJECT_STORAGE_ENDPOINT",
+    )
+    object_storage_public_endpoint: str = Field(
+        default="http://localhost:9000",
+        alias="OBJECT_STORAGE_PUBLIC_ENDPOINT",
+    )
+    object_storage_bucket: str = Field(
+        default="yaqin-private",
+        min_length=3,
+        max_length=63,
+        pattern=r"^[a-z0-9][a-z0-9.-]*[a-z0-9]$",
+        alias="OBJECT_STORAGE_BUCKET",
+    )
+    object_storage_region: str = Field(
+        default="us-east-1",
+        min_length=1,
+        max_length=64,
+        alias="OBJECT_STORAGE_REGION",
+    )
+    object_storage_access_key: SecretStr = Field(
+        default=SecretStr("change-me"),
+        min_length=3,
+        alias="OBJECT_STORAGE_ACCESS_KEY",
+    )
+    object_storage_secret_key: SecretStr = Field(
+        default=SecretStr("change-me"),
+        min_length=8,
+        alias="OBJECT_STORAGE_SECRET_KEY",
+    )
+    signed_url_ttl_seconds: int = Field(
+        default=300,
+        ge=60,
+        le=900,
+        alias="SIGNED_URL_TTL_SECONDS",
+    )
+    audio_allowed_content_types: str = Field(
+        default="audio/mp4,audio/mpeg,audio/ogg,audio/webm",
+        min_length=1,
+        alias="AUDIO_ALLOWED_CONTENT_TYPES",
+    )
+    audio_max_size_bytes: int = Field(
+        default=10_485_760,
+        ge=1,
+        le=104_857_600,
+        alias="AUDIO_MAX_SIZE_BYTES",
+    )
+    media_worker_poll_seconds: float = Field(
+        default=2.0,
+        ge=0.1,
+        le=60.0,
+        alias="MEDIA_WORKER_POLL_SECONDS",
+    )
+    media_validation_max_attempts: int = Field(
+        default=5,
+        ge=1,
+        le=20,
+        alias="MEDIA_VALIDATION_MAX_ATTEMPTS",
+    )
 
     @field_validator("database_url", mode="before")
     @classmethod
@@ -144,6 +205,27 @@ class Settings(BaseSettings):
             raise ValueError("VIDEO_ALLOWED_HOSTS must be a comma-separated hostname list")
         return ",".join(dict.fromkeys(hosts))
 
+    @field_validator("object_storage_endpoint", "object_storage_public_endpoint")
+    @classmethod
+    def validate_object_storage_endpoint(cls, value: str) -> str:
+        parsed = urlsplit(value.strip())
+        if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+            raise ValueError("object storage endpoint must be an absolute HTTP(S) URL")
+        if parsed.username or parsed.password or parsed.query or parsed.fragment:
+            raise ValueError("object storage endpoint must not contain credentials or query data")
+        path = parsed.path.rstrip("/")
+        return urlunsplit((parsed.scheme, parsed.netloc.lower(), path, "", ""))
+
+    @field_validator("audio_allowed_content_types")
+    @classmethod
+    def validate_audio_allowed_content_types(cls, value: str) -> str:
+        content_types = [item.strip().lower() for item in value.split(",")]
+        if not content_types or any(
+            not item.startswith("audio/") or ";" in item or " " in item for item in content_types
+        ):
+            raise ValueError("AUDIO_ALLOWED_CONTENT_TYPES must contain audio MIME types")
+        return ",".join(dict.fromkeys(content_types))
+
     @model_validator(mode="after")
     def reject_development_password_outside_development(self) -> Self:
         """Prevent the documented local password from reaching shared environments."""
@@ -160,6 +242,10 @@ class Settings(BaseSettings):
                 raise ValueError("SESSION_SECRET must not use a placeholder")
             if self.csrf_secret_value in forbidden_auth_secrets:
                 raise ValueError("CSRF_SECRET must not use a placeholder")
+            if self.object_storage_access_key_value == "change-me":
+                raise ValueError("OBJECT_STORAGE_ACCESS_KEY must not use a placeholder")
+            if self.object_storage_secret_key_value == "change-me":
+                raise ValueError("OBJECT_STORAGE_SECRET_KEY must not use a placeholder")
         return self
 
     @property
@@ -185,6 +271,18 @@ class Settings(BaseSettings):
     @property
     def video_allowed_host_values(self) -> frozenset[str]:
         return frozenset(self.video_allowed_hosts.split(","))
+
+    @property
+    def object_storage_access_key_value(self) -> str:
+        return self.object_storage_access_key.get_secret_value()
+
+    @property
+    def object_storage_secret_key_value(self) -> str:
+        return self.object_storage_secret_key.get_secret_value()
+
+    @property
+    def audio_allowed_content_type_values(self) -> frozenset[str]:
+        return frozenset(self.audio_allowed_content_types.split(","))
 
     @property
     def database_connect_options(self) -> str:

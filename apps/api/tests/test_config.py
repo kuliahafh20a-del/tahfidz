@@ -56,6 +56,20 @@ def test_settings_reject_placeholder_auth_secrets_in_production() -> None:
         )
 
 
+def test_settings_reject_placeholder_storage_secrets_in_production() -> None:
+    with pytest.raises(ValidationError, match="OBJECT_STORAGE_ACCESS_KEY"):
+        Settings.model_validate(
+            {
+                "APP_ENV": AppEnvironment.PRODUCTION,
+                "DATABASE_URL": "postgresql://yaqin:a-real-password@localhost/yaqin",
+                "SESSION_SECRET": "a-real-session-secret-with-at-least-32-characters",
+                "CSRF_SECRET": "a-real-csrf-secret-with-at-least-32-characters",
+                "OBJECT_STORAGE_ACCESS_KEY": "change-me",
+                "OBJECT_STORAGE_SECRET_KEY": "a-real-storage-secret",
+            }
+        )
+
+
 def test_settings_reject_unknown_business_timezone() -> None:
     with pytest.raises(ValidationError, match="IANA timezone"):
         Settings.model_validate(
@@ -81,5 +95,30 @@ def test_settings_normalize_video_host_allowlist() -> None:
             {
                 "DATABASE_URL": "postgresql://yaqin:secret@localhost/yaqin",
                 "VIDEO_ALLOWED_HOSTS": "https://youtube.com",
+            }
+        )
+
+
+def test_settings_validate_private_media_boundaries() -> None:
+    settings = Settings.model_validate(
+        {
+            "DATABASE_URL": "postgresql://yaqin:secret@localhost/yaqin",
+            "OBJECT_STORAGE_ENDPOINT": "http://OBJECT-STORAGE:9000/",
+            "OBJECT_STORAGE_PUBLIC_ENDPOINT": "https://media.example.test/",
+            "AUDIO_ALLOWED_CONTENT_TYPES": " AUDIO/MP4,audio/mpeg,audio/mp4 ",
+            "AUDIO_MAX_SIZE_BYTES": 1024,
+        }
+    )
+
+    assert settings.object_storage_endpoint == "http://object-storage:9000"
+    assert settings.object_storage_public_endpoint == "https://media.example.test"
+    assert settings.audio_allowed_content_type_values == frozenset({"audio/mp4", "audio/mpeg"})
+    assert settings.audio_max_size_bytes == 1024
+
+    with pytest.raises(ValidationError, match="audio MIME types"):
+        Settings.model_validate(
+            {
+                "DATABASE_URL": "postgresql://yaqin:secret@localhost/yaqin",
+                "AUDIO_ALLOWED_CONTENT_TYPES": "application/octet-stream",
             }
         )

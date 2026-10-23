@@ -16,6 +16,7 @@ from app.modules.curriculum.models import (
     ThemeRange,
 )
 from app.modules.identity.models import RoleGrant, User
+from app.modules.media.models import MediaAsset
 from app.modules.mentoring.models import MentoringSession, SessionTheme
 from app.modules.operations.models import IdempotencyRecord
 from app.modules.organizations.models import Organization
@@ -54,6 +55,7 @@ MODEL_TYPES = (
     VideoVersion,
     EligibilityReview,
     EligibilityCheck,
+    MediaAsset,
 )
 metadata: MetaData = Base.metadata
 
