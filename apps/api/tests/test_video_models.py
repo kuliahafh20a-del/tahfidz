@@ -4,10 +4,18 @@ import pytest
 from pydantic import ValidationError
 
 from app.db.base import Base
-from app.modules.video.models import VideoAttempt, VideoAttemptStatus, VideoVersion
-from app.modules.video.schemas import VideoVersionCreate
+from app.modules.video.models import (
+    EligibilityCheck,
+    EligibilityDecision,
+    EligibilityReview,
+    VideoAttempt,
+    VideoAttemptStatus,
+    VideoVersion,
+)
+from app.modules.video.schemas import EligibilityCheckInput, EligibilityFinalize, VideoVersionCreate
 from app.modules.video.service import (
     VideoConflictError,
+    VideoEligibilityService,
     VideoSubmissionService,
     VideoUrlNotAllowedError,
 )
@@ -16,12 +24,20 @@ from app.modules.video.service import (
 def test_video_models_register_slot_and_version_constraints() -> None:
     attempts = Base.metadata.tables["app.video_attempts"]
     versions = Base.metadata.tables["app.video_versions"]
+    reviews = Base.metadata.tables["app.eligibility_reviews"]
+    checks = Base.metadata.tables["app.eligibility_checks"]
 
     assert VideoAttempt.__table__ is attempts
     assert VideoVersion.__table__ is versions
+    assert EligibilityReview.__table__ is reviews
+    assert EligibilityCheck.__table__ is checks
     assert any(
         constraint.name == "uq_video_attempts__enrollment_part_cycle_revision"
         for constraint in attempts.constraints
+    )
+    assert any(
+        constraint.name == "uq_eligibility_checks__review_id_criterion_code"
+        for constraint in checks.constraints
     )
     assert any(
         constraint.name == "uq_video_versions__attempt_id_version_no"
@@ -76,3 +92,21 @@ def test_server_allocates_revision_then_new_cycle_only_after_closed_slot() -> No
     latest.status = VideoAttemptStatus.SUBMITTED
     with pytest.raises(VideoConflictError):
         VideoSubmissionService._next_slot(latest)
+
+
+def test_eligibility_final_requires_reason_and_complete_versioned_checklist() -> None:
+    checks = [
+        EligibilityCheckInput(code=code, passed=True)
+        for code in ("duration_ok", "audio_clear", "continuous_recording")
+    ]
+    VideoEligibilityService._validate_checks("technical-v1", checks, complete=True)
+
+    with pytest.raises(VideoConflictError, match="every required"):
+        VideoEligibilityService._validate_checks("technical-v1", checks[:2], complete=True)
+    with pytest.raises(ValidationError, match="reason"):
+        EligibilityFinalize(
+            decision=EligibilityDecision.INELIGIBLE,
+            reason=None,
+            checks=checks,
+            expected_version=1,
+        )

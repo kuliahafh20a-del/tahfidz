@@ -43,6 +43,40 @@
   gap: var(--space-4);
 }
 
+.videoResult {
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+}
+
+.videoResult header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.videoResult h2,
+.videoResult p {
+  margin: 0;
+}
+
+.videoResult header p {
+  margin-top: var(--space-1);
+  color: var(--text-secondary);
+}
+
+.technicalReason {
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  background: var(--danger-100);
+  border-left: 0.25rem solid var(--danger-700);
+}
+
+.technicalReason p {
+  margin-top: var(--space-1);
+}
+
 .resultCard h2,
 .resultCard p {
   margin: var(--space-1) 0 0;
@@ -104,6 +138,10 @@
 
 @media (max-width: 47.9375rem) {
   .resultCard header {
+    flex-direction: column;
+  }
+
+  .videoResult header {
     flex-direction: column;
   }
 

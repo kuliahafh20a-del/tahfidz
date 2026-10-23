@@ -1,0 +1,125 @@
+.supportCopy,
+.videoMeta {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.queue {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.queueItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-4);
+  color: var(--text-primary);
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  gap: var(--space-4);
+}
+
+.queueItem[aria-pressed="true"] {
+  background: var(--brand-50);
+  border-color: var(--brand-700);
+}
+
+.queueItem span:first-child {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.queueItem small {
+  color: var(--text-secondary);
+}
+
+.videoMeta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+  gap: var(--space-4);
+}
+
+.form,
+.form fieldset {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.form fieldset {
+  padding: 0;
+  border: 0;
+}
+
+.form legend {
+  margin-bottom: var(--space-3);
+  font-weight: 800;
+}
+
+.criterion {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 0.8fr);
+  padding: var(--space-3);
+  background: var(--brand-50);
+  border-radius: var(--radius-control);
+  gap: var(--space-4);
+}
+
+.form label {
+  display: grid;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.form input,
+.form select,
+.form textarea {
+  width: 100%;
+  padding: var(--space-3);
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  font: inherit;
+}
+
+.form textarea {
+  resize: vertical;
+}
+
+.checkLabel {
+  display: flex !important;
+  align-items: center;
+  flex-direction: row;
+}
+
+.checkLabel input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--brand-700);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+@media (max-width: 47.9375rem) {
+  .criterion {
+    grid-template-columns: 1fr;
+  }
+
+  .videoMeta,
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

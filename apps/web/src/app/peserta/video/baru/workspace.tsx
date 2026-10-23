@@ -5,7 +5,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { AppShell, PageHeader, SupportPanel, WorkSupportLayout } from "@/components/shell";
 import { Button, Card, DataTable, FeedbackState, StatusBadge } from "@/components/ui";
 import { apiRequest, CursorPage, SessionContext, Target } from "@/lib/mentoring";
-import { VideoAttempt } from "@/lib/video";
+import { VideoAttempt, VideoEligibility } from "@/lib/video";
 
 import styles from "./workspace.module.css";
 
@@ -21,6 +21,7 @@ type PartChoice = {
 export function VideoSubmissionWorkspace() {
   const [context, setContext] = useState<SessionContext | null>(null);
   const [targets, setTargets] = useState<Target[]>([]);
+  const [videoResults, setVideoResults] = useState<VideoEligibility[]>([]);
   const [partId, setPartId] = useState("");
   const [attempt, setAttempt] = useState<VideoAttempt | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,11 +34,17 @@ export function VideoSubmissionWorkspace() {
     void Promise.all([
       apiRequest<SessionContext>("/auth/session"),
       apiRequest<CursorPage<Target>>("/me/targets?limit=100"),
+      apiRequest<VideoEligibility[]>("/me/video-results"),
     ])
-      .then(([loadedContext, targetPage]) => {
+      .then(([loadedContext, targetPage, loadedVideoResults]) => {
         if (!active) return;
         setContext(loadedContext);
         setTargets(targetPage.items);
+        setVideoResults(loadedVideoResults);
+        const replacement = loadedVideoResults.find((item) =>
+          item.allowed_actions.includes("replace_video"),
+        );
+        if (replacement) setPartId(replacement.part_id);
       })
       .catch((caught: unknown) => {
         if (active) setError(caught instanceof Error ? caught.message : "Data tidak tersedia.");
@@ -80,14 +87,19 @@ export function VideoSubmissionWorkspace() {
     try {
       let activeAttempt = attempt;
       if (activeAttempt === null || activeAttempt.part_id !== partId) {
-        activeAttempt = await apiRequest<VideoAttempt>("/video-attempts", {
-          method: "POST",
-          headers: {
-            "Idempotency-Key": crypto.randomUUID(),
-            "X-CSRF-Token": context.csrf_token,
-          },
-          body: JSON.stringify({ part_id: partId }),
-        });
+        const replacement = videoResults.find(
+          (item) => item.part_id === partId && item.allowed_actions.includes("replace_video"),
+        );
+        activeAttempt = replacement
+          ? await apiRequest<VideoAttempt>(`/video-attempts/${replacement.attempt_id}`)
+          : await apiRequest<VideoAttempt>("/video-attempts", {
+              method: "POST",
+              headers: {
+                "Idempotency-Key": crypto.randomUUID(),
+                "X-CSRF-Token": context.csrf_token,
+              },
+              body: JSON.stringify({ part_id: partId }),
+            });
         setAttempt(activeAttempt);
       }
       const updated = await apiRequest<VideoAttempt>(

@@ -419,6 +419,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/me/video-results": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Participant Video Results */
+    get: operations["list_participant_video_results_api_v1_me_video_results_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/mentor/participants": {
     parameters: {
       query?: never;
@@ -479,6 +496,23 @@ export interface paths {
     };
     /** Read Mentor Session */
     get: operations["read_mentor_session_api_v1_mentor_sessions__session_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/mentor/video-versions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Mentor Video Versions */
+    get: operations["list_mentor_video_versions_api_v1_mentor_video_versions_get"];
     put?: never;
     post?: never;
     delete?: never;
@@ -754,6 +788,57 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/video-versions/{video_version_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read Video Version */
+    get: operations["read_video_version_api_v1_video_versions__video_version_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/video-versions/{video_version_id}/eligibility": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Finalize Eligibility */
+    post: operations["finalize_eligibility_api_v1_video_versions__video_version_id__eligibility_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/video-versions/{video_version_id}/eligibility-draft": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Save Eligibility Draft */
+    put: operations["save_eligibility_draft_api_v1_video_versions__video_version_id__eligibility_draft_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/health/live": {
     parameters: {
       query?: never;
@@ -942,6 +1027,15 @@ export interface components {
       part_name: string;
       /** Part No */
       part_no: number;
+    };
+    /** ChecklistCriterionResponse */
+    ChecklistCriterionResponse: {
+      /** Code */
+      code: string;
+      /** Label */
+      label: string;
+      /** Required */
+      required: boolean;
     };
     /** CohortCalendarResponse */
     CohortCalendarResponse: {
@@ -1262,6 +1356,89 @@ export interface components {
       target_id: string;
       theme: components["schemas"]["CalendarTheme"];
     };
+    /** EligibilityCheckInput */
+    EligibilityCheckInput: {
+      /** Code */
+      code: string;
+      /** Note */
+      note?: string | null;
+      /** Passed */
+      passed: boolean;
+    };
+    /** EligibilityCheckResponse */
+    EligibilityCheckResponse: {
+      /** Code */
+      code: string;
+      /** Note */
+      note: string | null;
+      /** Passed */
+      passed: boolean;
+    };
+    /**
+     * EligibilityDecision
+     * @enum {string}
+     */
+    EligibilityDecision: "eligible" | "ineligible";
+    /** EligibilityDraftUpdate */
+    EligibilityDraftUpdate: {
+      /**
+       * Checklist Version
+       * @default technical-v1
+       */
+      checklist_version: string;
+      /** Checks */
+      checks?: components["schemas"]["EligibilityCheckInput"][];
+      decision?: components["schemas"]["EligibilityDecision"] | null;
+      /** Expected Version */
+      expected_version?: number | null;
+      /** Reason */
+      reason?: string | null;
+    };
+    /** EligibilityFinalize */
+    EligibilityFinalize: {
+      /**
+       * Checklist Version
+       * @default technical-v1
+       */
+      checklist_version: string;
+      /** Checks */
+      checks: components["schemas"]["EligibilityCheckInput"][];
+      decision: components["schemas"]["EligibilityDecision"];
+      /** Expected Version */
+      expected_version: number;
+      /** Reason */
+      reason?: string | null;
+    };
+    /** EligibilityReviewResponse */
+    EligibilityReviewResponse: {
+      /** Checklist Version */
+      checklist_version: string;
+      /** Checks */
+      checks: components["schemas"]["EligibilityCheckResponse"][];
+      decision: components["schemas"]["EligibilityDecision"] | null;
+      /** Finalized At */
+      finalized_at: string | null;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      /** Reason */
+      reason: string | null;
+      /**
+       * Reviewer Id
+       * Format: uuid
+       */
+      reviewer_id: string;
+      /** Row Version */
+      row_version: number;
+      status: components["schemas"]["EligibilityReviewStatus"];
+    };
+    /**
+     * EligibilityReviewStatus
+     * @enum {string}
+     */
+    EligibilityReviewStatus: "draft" | "final" | "superseded";
     /**
      * EnrollmentCreate
      * @description Enroll an existing participant account in a scoped cohort.
@@ -2031,6 +2208,17 @@ export interface components {
       /** Version */
       version?: number | null;
     };
+    /** SuccessEnvelope[VideoEligibilityResponse] */
+    SuccessEnvelope_VideoEligibilityResponse_: {
+      data: components["schemas"]["VideoEligibilityResponse"];
+      /**
+       * Request Id
+       * Format: uuid
+       */
+      request_id: string;
+      /** Version */
+      version?: number | null;
+    };
     /** SuccessEnvelope[dict[str, str]] */
     SuccessEnvelope_dict_str__str__: {
       /** Data */
@@ -2049,6 +2237,18 @@ export interface components {
     SuccessEnvelope_list_ThemeAssessmentResponse__: {
       /** Data */
       data: components["schemas"]["ThemeAssessmentResponse"][];
+      /**
+       * Request Id
+       * Format: uuid
+       */
+      request_id: string;
+      /** Version */
+      version?: number | null;
+    };
+    /** SuccessEnvelope[list[VideoEligibilityResponse]] */
+    SuccessEnvelope_list_VideoEligibilityResponse__: {
+      /** Data */
+      data: components["schemas"]["VideoEligibilityResponse"][];
       /**
        * Request Id
        * Format: uuid
@@ -2299,6 +2499,55 @@ export interface components {
      */
     VideoAttemptStatus:
       "open" | "submitted" | "under_review" | "finalized" | "closed";
+    /** VideoEligibilityResponse */
+    VideoEligibilityResponse: {
+      /** Allowed Actions */
+      allowed_actions: string[];
+      /**
+       * Attempt Id
+       * Format: uuid
+       */
+      attempt_id: string;
+      /** Checklist Version */
+      checklist_version: string;
+      /** Criteria */
+      criteria: components["schemas"]["ChecklistCriterionResponse"][];
+      /** Cycle No */
+      cycle_no: number;
+      /**
+       * Part Id
+       * Format: uuid
+       */
+      part_id: string;
+      /** Part Name */
+      part_name: string;
+      /** Part No */
+      part_no: number;
+      participant: components["schemas"]["SessionParticipant"];
+      /**
+       * Recorded On
+       * Format: date
+       */
+      recorded_on: string;
+      review: components["schemas"]["EligibilityReviewResponse"] | null;
+      /** Revision No */
+      revision_no: number;
+      /**
+       * Submitted At
+       * Format: date-time
+       */
+      submitted_at: string;
+      video_status: components["schemas"]["VideoVersionStatus"];
+      /** Video Url */
+      video_url: string;
+      /**
+       * Video Version Id
+       * Format: uuid
+       */
+      video_version_id: string;
+      /** Video Version No */
+      video_version_no: number;
+    };
     /** VideoVersionCreate */
     VideoVersionCreate: {
       /** Completeness Declared */
@@ -5350,6 +5599,109 @@ export interface operations {
       };
     };
   };
+  list_participant_video_results_api_v1_me_video_results_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_list_VideoEligibilityResponse__"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
   list_mentor_participants_api_v1_mentor_participants_get: {
     parameters: {
       query?: {
@@ -5693,6 +6045,109 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["app__api__contracts__SuccessEnvelope_SessionResponse___2"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  list_mentor_video_versions_api_v1_mentor_video_versions_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_list_VideoEligibilityResponse__"];
         };
       };
       /** @description Bad Request */
@@ -7655,6 +8110,337 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["SuccessEnvelope_VideoAttemptResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  read_video_version_api_v1_video_versions__video_version_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        video_version_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_VideoEligibilityResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  finalize_eligibility_api_v1_video_versions__video_version_id__eligibility_post: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description UUID unique to one logical command and payload. */
+        "Idempotency-Key": string;
+        "X-CSRF-Token"?: string | null;
+      };
+      path: {
+        video_version_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EligibilityFinalize"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_VideoEligibilityResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  save_eligibility_draft_api_v1_video_versions__video_version_id__eligibility_draft_put: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description UUID unique to one logical command and payload. */
+        "Idempotency-Key": string;
+        "X-CSRF-Token"?: string | null;
+      };
+      path: {
+        video_version_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EligibilityDraftUpdate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_VideoEligibilityResponse_"];
         };
       };
       /** @description Bad Request */

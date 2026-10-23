@@ -13,12 +13,14 @@ import {
   ThemeAssessment,
 } from "@/lib/assessments";
 import { apiRequest, CursorPage, dateTimeLabel, SessionContext } from "@/lib/mentoring";
+import { VideoEligibility } from "@/lib/video";
 
 import styles from "./workspace.module.css";
 
 export function ParticipantResultsWorkspace() {
   const [context, setContext] = useState<SessionContext | null>(null);
   const [results, setResults] = useState<ThemeAssessment[]>([]);
+  const [videoResults, setVideoResults] = useState<VideoEligibility[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -28,11 +30,13 @@ export function ParticipantResultsWorkspace() {
     void Promise.all([
       apiRequest<SessionContext>("/auth/session"),
       apiRequest<CursorPage<ThemeAssessment>>("/me/theme-results?limit=100"),
+      apiRequest<VideoEligibility[]>("/me/video-results"),
     ])
-      .then(([loadedContext, page]) => {
+      .then(([loadedContext, page, loadedVideoResults]) => {
         if (!active) return;
         setContext(loadedContext);
         setResults(page.items);
+        setVideoResults(loadedVideoResults);
         setError(null);
       })
       .catch((caught: unknown) => {
@@ -51,6 +55,9 @@ export function ParticipantResultsWorkspace() {
     [results],
   );
   const enoughCount = results.filter((item) => item.outcome === "enough").length;
+  const technicalFollowUps = videoResults.filter((item) =>
+    item.allowed_actions.includes("replace_video"),
+  );
 
   return (
     <AppShell
@@ -113,6 +120,10 @@ export function ParticipantResultsWorkspace() {
                   <div>
                     <dt>Perlu tindakan</dt>
                     <dd>{followUps.length}</dd>
+                  </div>
+                  <div>
+                    <dt>Video perlu diganti</dt>
+                    <dd>{technicalFollowUps.length}</dd>
                   </div>
                 </dl>
               </SupportPanel>
@@ -191,6 +202,56 @@ export function ParticipantResultsWorkspace() {
               ))}
             </div>
           )}
+
+          {videoResults.length ? (
+            <Card title="Kelayakan teknis video">
+              <div className={styles.results}>
+                {videoResults.map((item) => (
+                  <article className={styles.videoResult} key={item.video_version_id}>
+                    <header>
+                      <div>
+                        <h2>
+                          Bagian {item.part_no} · {item.part_name}
+                        </h2>
+                        <p>
+                          Siklus {item.cycle_no} · Revisi {item.revision_no} · Versi media{" "}
+                          {item.video_version_no}
+                        </p>
+                      </div>
+                      <StatusBadge
+                        tone={
+                          item.review?.decision === "eligible"
+                            ? "success"
+                            : item.review?.decision === "ineligible"
+                              ? "danger"
+                              : "warning"
+                        }
+                      >
+                        {item.review?.decision === "eligible"
+                          ? "Layak"
+                          : item.review?.decision === "ineligible"
+                            ? "Tidak layak"
+                            : item.review
+                              ? "Draft Mentor"
+                              : "Menunggu pemeriksaan"}
+                      </StatusBadge>
+                    </header>
+                    {item.review?.decision === "ineligible" ? (
+                      <div className={styles.technicalReason}>
+                        <strong>Alasan teknis</strong>
+                        <p>{item.review.reason}</p>
+                      </div>
+                    ) : null}
+                    {item.allowed_actions.includes("replace_video") ? (
+                      <Link className={styles.actionLink} href="/peserta/video/baru">
+                        Kirim video pengganti
+                      </Link>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+            </Card>
+          ) : null}
         </WorkSupportLayout>
       ) : null}
     </AppShell>

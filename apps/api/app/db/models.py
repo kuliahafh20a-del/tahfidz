@@ -19,7 +19,12 @@ from app.modules.identity.models import RoleGrant, User
 from app.modules.mentoring.models import MentoringSession, SessionTheme
 from app.modules.operations.models import IdempotencyRecord
 from app.modules.organizations.models import Organization
-from app.modules.video.models import VideoAttempt, VideoVersion
+from app.modules.video.models import (
+    EligibilityCheck,
+    EligibilityReview,
+    VideoAttempt,
+    VideoVersion,
+)
 
 MODEL_TYPES = (
     Organization,
@@ -47,6 +52,8 @@ MODEL_TYPES = (
     IdempotencyRecord,
     VideoAttempt,
     VideoVersion,
+    EligibilityReview,
+    EligibilityCheck,
 )
 metadata: MetaData = Base.metadata
 
