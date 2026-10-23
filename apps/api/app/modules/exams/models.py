@@ -24,6 +24,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base, TimestampMixin, UTCDateTime, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
+    from app.modules.assessments.models import ExamAssessment
     from app.modules.cohorts.models import Enrollment
     from app.modules.curriculum.models import PolicyVersion
     from app.modules.identity.models import User
@@ -128,6 +129,10 @@ class Exam(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "exams"
     __table_args__ = (
         CheckConstraint("notes IS NULL OR length(btrim(notes)) > 0", name="notes_not_blank"),
+        CheckConstraint("d_score IS NULL OR d_score BETWEEN 1 AND 10", name="d_score_range"),
+        CheckConstraint(
+            "jsonb_typeof(evidence_media_ids) = 'array'", name="evidence_media_ids_array"
+        ),
         CheckConstraint(
             "(status = 'final' AND finalized_at IS NOT NULL) OR "
             "(status <> 'final' AND finalized_at IS NULL)",
@@ -164,6 +169,10 @@ class Exam(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
     row_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1, server_default="1")
     finalized_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
+    d_score: Mapped[Decimal | None] = mapped_column(Numeric(6, 3), nullable=True)
+    evidence_media_ids: Mapped[list[str]] = mapped_column(
+        JSONB, nullable=False, default=list, server_default="[]"
+    )
 
     __mapper_args__ = {"version_id_col": row_version}
 
@@ -201,3 +210,6 @@ class ExamItem(UUIDPrimaryKeyMixin, Base):
 
     exam: Mapped[Exam] = relationship(back_populates="items")
     question_version: Mapped[QuestionVersion] = relationship()
+    assessment: Mapped[ExamAssessment | None] = relationship(
+        back_populates="exam_item", uselist=False
+    )

@@ -45,6 +45,7 @@ def test_policy_rules_accept_the_approved_integer_scale() -> None:
     assert rules.exam_package.approved is False
     assert rules.exam_package.required_item_count is None
     assert rules.exam_package.expected_total_weight is None
+    assert rules.exam_package.aggregation_method is None
 
 
 def test_approved_exam_package_policy_requires_count_and_total_weight() -> None:
@@ -52,8 +53,9 @@ def test_approved_exam_package_policy_requires_count_and_total_weight() -> None:
         **VALID_RULES,
         "exam_package": {
             "approved": True,
-            "required_item_count": None,
-            "expected_total_weight": None,
+            "required_item_count": 3,
+            "expected_total_weight": 100,
+            "aggregation_method": None,
         },
     }
 

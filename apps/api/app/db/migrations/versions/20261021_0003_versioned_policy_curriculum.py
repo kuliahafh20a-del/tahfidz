@@ -55,6 +55,7 @@ POLICY_RULES = {
         "approved": False,
         "required_item_count": None,
         "expected_total_weight": None,
+        "aggregation_method": None,
     },
 }
 

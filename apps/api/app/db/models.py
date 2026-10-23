@@ -5,6 +5,7 @@ from sqlalchemy import MetaData
 from app.db.base import Base
 from app.modules.assessments.models import (
     AssessmentRecord,
+    ExamAssessment,
     Incident,
     ThemeAssessment,
     VideoAssessment,
@@ -52,6 +53,7 @@ MODEL_TYPES = (
     AssessmentRecord,
     ThemeAssessment,
     VideoAssessment,
+    ExamAssessment,
     Incident,
     AuditEvent,
     AuthSession,

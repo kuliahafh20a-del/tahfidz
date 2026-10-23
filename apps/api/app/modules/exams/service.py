@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from uuid import UUID, uuid4
 
 from sqlalchemy import Select, distinct, exists, func, or_, select
@@ -13,11 +13,15 @@ from sqlalchemy.sql.elements import ColumnElement
 
 from app.core.time import ensure_utc, utc_now
 from app.modules.assessments.models import (
+    AssessmentKind,
     AssessmentRecord,
     AssessmentStatus,
+    ExamAssessment,
+    Incident,
     VideoAssessment,
     VideoAssessmentOutcome,
 )
+from app.modules.assessments.schemas import IncidentInput, IncidentResponse
 from app.modules.audit.models import AuditEvent
 from app.modules.cohorts.models import (
     Assignment,
@@ -39,16 +43,22 @@ from app.modules.exams.models import (
     QuestionVersion,
 )
 from app.modules.exams.schemas import (
+    ExamAssessmentDraft,
+    ExamAssessmentResponse,
     ExamCreate,
+    ExamFinalize,
     ExamItemResponse,
     ExamItemsReplace,
     ExamQueueItemResponse,
     ExamResponse,
+    ExamStart,
+    ExamSummaryResponse,
     ExamUpdate,
     PackagePolicyResponse,
     QuestionVersionCreate,
     QuestionVersionResponse,
 )
+from app.modules.media.models import MediaAsset, MediaAssetStatus
 from app.modules.mentoring.schemas import SessionParticipant
 from app.modules.video.models import VideoAttempt, VideoVersion
 
@@ -65,6 +75,10 @@ class ExamVersionConflictError(ExamConflictError):
     def __init__(self, current_version: int) -> None:
         super().__init__("exam was updated by another request")
         self.current_version = current_version
+
+
+class ExamPolicyNotApprovedError(ExamConflictError):
+    pass
 
 
 class ExamPackageService:
@@ -205,6 +219,166 @@ class ExamPackageService:
 
     async def get_exam(self, actor: LecturerActor, exam_id: UUID) -> ExamResponse:
         return self._response(await self._lecturer_exam(actor, exam_id))
+
+    async def list_exams(self, actor: LecturerActor) -> list[ExamResponse]:
+        now = utc_now()
+        exams = list(
+            await self.session.scalars(
+                self._base_statement()
+                .join(Enrollment, Enrollment.id == Exam.enrollment_id)
+                .join(Cohort, Cohort.id == Enrollment.cohort_id)
+                .where(
+                    Cohort.organization_id == actor.organization_id,
+                    self._active_assignment(actor.user_id, Enrollment.id, now),
+                )
+                .order_by(Exam.scheduled_at.desc(), Exam.id.desc())
+            )
+        )
+        return [self._response(exam) for exam in exams]
+
+    async def start_exam(
+        self, actor: LecturerActor, exam_id: UUID, payload: ExamStart, request_id: UUID
+    ) -> ExamResponse:
+        exam = await self._lecturer_exam(actor, exam_id, lock=True, author=True)
+        self._require_version(exam, payload.expected_version)
+        if exam.status not in {ExamStatus.DRAFT, ExamStatus.SCHEDULED}:
+            raise ExamConflictError("only a prepared exam can be started")
+        if not exam.items:
+            raise ExamConflictError("exam package must contain at least one item")
+        if await self._completed_parts(exam.enrollment_id) != self.REQUIRED_PARTS:
+            raise ExamConflictError("participant no longer has five enough video parts")
+        exam.actual_at = ensure_utc(payload.actual_at)
+        exam.status = ExamStatus.IN_PROGRESS
+        await self.session.flush()
+        self.session.add(self._audit(actor.user_id, request_id, "exam.started", exam))
+        await self.session.flush()
+        return self._response(await self._load(exam.id))
+
+    async def save_assessment_draft(
+        self,
+        actor: LecturerActor,
+        exam_id: UUID,
+        payload: ExamAssessmentDraft,
+        request_id: UUID,
+    ) -> ExamResponse:
+        exam = await self._lecturer_exam(actor, exam_id, lock=True, author=True)
+        self._require_version(exam, payload.expected_version)
+        if exam.status is not ExamStatus.IN_PROGRESS or exam.actual_at is None:
+            raise ExamConflictError("exam must be in progress before assessment can be saved")
+        ids = [item.exam_item_id for item in payload.items]
+        if len(ids) != len(set(ids)):
+            raise ExamConflictError("an exam item assessment cannot be repeated")
+        indexed = {item.id: item for item in exam.items}
+        if any(item_id not in indexed for item_id in ids):
+            raise ExamNotFoundError("exam item not found in lecturer scope")
+        for draft in payload.items:
+            item = indexed[draft.exam_item_id]
+            subtype = item.assessment
+            if subtype is None:
+                record = AssessmentRecord(
+                    enrollment_id=exam.enrollment_id,
+                    assessor_id=actor.user_id,
+                    policy_version_id=exam.policy_version_id,
+                    kind=AssessmentKind.EXAM,
+                    actual_at=exam.actual_at,
+                    manual_score=(
+                        Decimal(draft.manual_score) if draft.manual_score is not None else None
+                    ),
+                    status=AssessmentStatus.DRAFT,
+                    incidents=[],
+                )
+                subtype = ExamAssessment(exam_item_id=item.id, notes=self._note(draft.notes))
+                record.exam_assessment = subtype
+                self.session.add(record)
+            else:
+                record = subtype.assessment
+                if record.status is not AssessmentStatus.DRAFT:
+                    raise ExamConflictError("final exam item assessment cannot be edited")
+                record.manual_score = (
+                    Decimal(draft.manual_score) if draft.manual_score is not None else None
+                )
+                subtype.notes = self._note(draft.notes)
+            self._replace_incidents(record, draft.incidents)
+        exam.row_version += 1
+        await self.session.flush()
+        self.session.add(self._audit(actor.user_id, request_id, "exam.assessment_saved", exam))
+        await self.session.flush()
+        return self._response(await self._load(exam.id))
+
+    async def finalize_exam(
+        self, actor: LecturerActor, exam_id: UUID, payload: ExamFinalize, request_id: UUID
+    ) -> ExamResponse:
+        exam = await self._lecturer_exam(actor, exam_id, lock=True, author=True)
+        self._require_version(exam, payload.expected_version)
+        if exam.status is not ExamStatus.IN_PROGRESS:
+            raise ExamConflictError("only an in-progress exam can be finalized")
+        package = self._package_policy(exam)
+        if package.blockers:
+            raise ExamPolicyNotApprovedError(",".join(package.blockers))
+        if await self._completed_parts(exam.enrollment_id) != self.REQUIRED_PARTS:
+            raise ExamConflictError("participant no longer has five enough video parts")
+        records = [item.assessment.assessment for item in exam.items if item.assessment is not None]
+        if len(records) != len(exam.items) or any(
+            record.manual_score is None for record in records
+        ):
+            raise ExamConflictError("every exam item requires a score before finalization")
+        evidence_ids = list(dict.fromkeys(payload.evidence_media_ids))
+        available_evidence = list(
+            await self.session.scalars(
+                select(MediaAsset.id).where(
+                    MediaAsset.id.in_(evidence_ids),
+                    MediaAsset.organization_id == actor.organization_id,
+                    MediaAsset.status == MediaAssetStatus.AVAILABLE,
+                )
+            )
+        )
+        if len(available_evidence) != len(evidence_ids):
+            raise ExamConflictError("all execution evidence must be available in lecturer scope")
+        rule = PolicyRules.model_validate(exam.policy_version.rules).exam_package
+        scores = [record.manual_score for record in records if record.manual_score is not None]
+        if rule.aggregation_method == "simple_average":
+            d_score = sum(scores, Decimal()) / Decimal(len(scores))
+        elif rule.aggregation_method == "weighted_average":
+            weighted = sum(
+                score * (item.weight or Decimal())
+                for score, item in zip(scores, exam.items, strict=True)
+            )
+            d_score = weighted / Decimal(rule.expected_total_weight or 1)
+        else:
+            raise ExamPolicyNotApprovedError("exam_aggregation_method_not_approved")
+        d_score = d_score.quantize(Decimal("0.001"), rounding=ROUND_HALF_UP)
+        if payload.manual_score is not None and payload.manual_score != d_score:
+            raise ExamConflictError("manual_score must match the approved item aggregation")
+        finalized_at = utc_now()
+        for record in records:
+            record.status = AssessmentStatus.FINAL
+            record.finalized_at = finalized_at
+        exam.actual_at = ensure_utc(payload.actual_at)
+        exam.notes = self._note(payload.examiner_note)
+        exam.evidence_media_ids = [str(item) for item in evidence_ids]
+        exam.d_score = d_score
+        exam.status = ExamStatus.FINAL
+        exam.finalized_at = finalized_at
+        await self.session.flush()
+        self.session.add(self._audit(actor.user_id, request_id, "exam.finalized", exam))
+        await self.session.flush()
+        return self._response(await self._load(exam.id))
+
+    async def exam_summary(self, actor: LecturerActor, exam_id: UUID) -> ExamSummaryResponse:
+        response = self._response(await self._lecturer_exam(actor, exam_id))
+        assessed = sum(item.manual_score is not None for item in response.assessments)
+        missing = list(response.package_policy.blockers)
+        if assessed != len(response.items):
+            missing.append("exam_item_assessments_incomplete")
+        if not response.evidence_media_ids:
+            missing.append("execution_evidence_missing")
+        return ExamSummaryResponse(
+            exam=response,
+            assessed_item_count=assessed,
+            total_item_count=len(response.items),
+            d_status="available" if response.d_score is not None else "policy_pending",
+            missing_requirements=missing,
+        )
 
     async def list_questions(self, actor: LecturerActor) -> list[QuestionVersionResponse]:
         questions = list(
@@ -352,7 +526,10 @@ class ExamPackageService:
         return select(Exam).options(
             selectinload(Exam.enrollment).selectinload(Enrollment.user),
             selectinload(Exam.policy_version),
-            selectinload(Exam.items),
+            selectinload(Exam.items)
+            .selectinload(ExamItem.assessment)
+            .selectinload(ExamAssessment.assessment)
+            .selectinload(AssessmentRecord.incidents),
         )
 
     async def _load(self, exam_id: UUID) -> Exam:
@@ -421,6 +598,7 @@ class ExamPackageService:
                 if rule.expected_total_weight is not None
                 else None
             ),
+            aggregation_method=rule.aggregation_method,
             blockers=blockers,
         )
 
@@ -447,6 +625,24 @@ class ExamPackageService:
     def _note(value: str | None) -> str | None:
         normalized = value.strip() if value is not None else ""
         return normalized or None
+
+    @staticmethod
+    def _replace_incidents(record: AssessmentRecord, items: list[IncidentInput]) -> None:
+        record.incidents.clear()
+        record.incidents.extend(
+            Incident(
+                category=item.primary_category.strip(),
+                location_text=item.location_text.strip(),
+                video_second=item.video_second,
+                context=ExamPackageService._note(item.context),
+                assistance_type=item.assistance,
+                self_corrected=item.self_corrected,
+                counted=item.counted,
+                count_reason=ExamPackageService._note(item.counting_reason),
+                notes=ExamPackageService._note(item.note),
+            )
+            for item in items
+        )
 
     @staticmethod
     def _audit(actor_id: UUID, request_id: UUID, action: str, exam: Exam) -> AuditEvent:
@@ -495,13 +691,59 @@ class ExamPackageService:
             status=exam.status,
             items=[ExamPackageService._item_response(item) for item in exam.items],
             package_policy=package,
+            assessments=[
+                ExamPackageService._assessment_response(item)
+                for item in exam.items
+                if item.assessment is not None
+            ],
+            d_score=exam.d_score,
+            evidence_media_ids=[UUID(item) for item in exam.evidence_media_ids],
             row_version=exam.row_version,
             finalized_at=exam.finalized_at,
-            allowed_actions=(
-                ["edit_exam", "edit_items", *(["review_package"] if not package.blockers else [])]
-                if exam.status is ExamStatus.DRAFT
-                else ["view_exam"]
-            ),
+            allowed_actions=ExamPackageService._allowed_actions(exam, package),
+        )
+
+    @staticmethod
+    def _allowed_actions(exam: Exam, package: PackagePolicyResponse) -> list[str]:
+        if exam.status is ExamStatus.DRAFT:
+            return ["edit_exam", "edit_items", "start_exam"]
+        if exam.status is ExamStatus.IN_PROGRESS:
+            return [
+                "edit_assessment",
+                "view_summary",
+                *(["finalize"] if not package.blockers else []),
+            ]
+        return ["view_summary"]
+
+    @staticmethod
+    def _assessment_response(item: ExamItem) -> ExamAssessmentResponse:
+        subtype = item.assessment
+        if subtype is None:
+            raise ExamConflictError("exam assessment subtype is missing")
+        record = subtype.assessment
+        return ExamAssessmentResponse(
+            assessment_id=record.id,
+            exam_item_id=item.id,
+            sequence_no=item.sequence_no,
+            status=record.status,
+            manual_score=int(record.manual_score) if record.manual_score is not None else None,
+            notes=subtype.notes,
+            incidents=[
+                IncidentResponse(
+                    id=incident.id,
+                    location_text=incident.location_text,
+                    video_second=incident.video_second,
+                    primary_category=incident.category,
+                    context=incident.context,
+                    assistance=incident.assistance_type,
+                    self_corrected=incident.self_corrected,
+                    counted=incident.counted,
+                    counting_reason=incident.count_reason,
+                    note=incident.notes,
+                )
+                for incident in record.incidents
+            ],
+            row_version=record.row_version,
         )
 
     @staticmethod
