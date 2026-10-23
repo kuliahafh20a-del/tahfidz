@@ -386,6 +386,40 @@ export interface paths {
     patch: operations["update_exam_api_v1_exams__exam_id__patch"];
     trace?: never;
   };
+  "/api/v1/exams/{exam_id}/assessment-draft": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Save Exam Assessment Draft */
+    put: operations["save_exam_assessment_draft_api_v1_exams__exam_id__assessment_draft_put"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/exams/{exam_id}/finalize": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Finalize Exam */
+    post: operations["finalize_exam_api_v1_exams__exam_id__finalize_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/exams/{exam_id}/items": {
     parameters: {
       query?: never;
@@ -403,6 +437,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/exams/{exam_id}/start": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Start Exam */
+    post: operations["start_exam_api_v1_exams__exam_id__start_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/exams/{exam_id}/summary": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read Exam Summary */
+    get: operations["read_exam_summary_api_v1_exams__exam_id__summary_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/lecturer/exam-queue": {
     parameters: {
       query?: never;
@@ -412,6 +480,23 @@ export interface paths {
     };
     /** List Exam Queue */
     get: operations["list_exam_queue_api_v1_lecturer_exam_queue_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/lecturer/exams": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Lecturer Exams */
+    get: operations["list_lecturer_exams_api_v1_lecturer_exams_get"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1880,6 +1965,51 @@ export interface components {
        */
       request_id: string;
     };
+    /** ExamAssessmentDraft */
+    ExamAssessmentDraft: {
+      /** Expected Version */
+      expected_version: number;
+      /** Items */
+      items: components["schemas"]["ExamAssessmentItemDraft"][];
+    };
+    /** ExamAssessmentItemDraft */
+    ExamAssessmentItemDraft: {
+      /**
+       * Exam Item Id
+       * Format: uuid
+       */
+      exam_item_id: string;
+      /** Incidents */
+      incidents?: components["schemas"]["IncidentInput"][];
+      /** Manual Score */
+      manual_score?: number | null;
+      /** Notes */
+      notes?: string | null;
+    };
+    /** ExamAssessmentResponse */
+    ExamAssessmentResponse: {
+      /**
+       * Assessment Id
+       * Format: uuid
+       */
+      assessment_id: string;
+      /**
+       * Exam Item Id
+       * Format: uuid
+       */
+      exam_item_id: string;
+      /** Incidents */
+      incidents: components["schemas"]["IncidentResponse"][];
+      /** Manual Score */
+      manual_score: number | null;
+      /** Notes */
+      notes: string | null;
+      /** Row Version */
+      row_version: number;
+      /** Sequence No */
+      sequence_no: number;
+      status: components["schemas"]["AssessmentStatus"];
+    };
     /** ExamCreate */
     ExamCreate: {
       /**
@@ -1892,6 +2022,22 @@ export interface components {
        * Format: date-time
        */
       scheduled_at: string;
+    };
+    /** ExamFinalize */
+    ExamFinalize: {
+      /**
+       * Actual At
+       * Format: date-time
+       */
+      actual_at: string;
+      /** Evidence Media Ids */
+      evidence_media_ids: string[];
+      /** Examiner Note */
+      examiner_note?: string | null;
+      /** Expected Version */
+      expected_version: number;
+      /** Manual Score */
+      manual_score?: number | string | null;
     };
     /** ExamItemInput */
     ExamItemInput: {
@@ -1960,6 +2106,12 @@ export interface components {
       actual_at: string | null;
       /** Allowed Actions */
       allowed_actions: string[];
+      /** Assessments */
+      assessments?: components["schemas"]["ExamAssessmentResponse"][];
+      /** D Score */
+      d_score?: string | null;
+      /** Evidence Media Ids */
+      evidence_media_ids?: string[];
       /** Finalized At */
       finalized_at: string | null;
       /**
@@ -1994,11 +2146,33 @@ export interface components {
       scheduled_at: string;
       status: components["schemas"]["ExamStatus"];
     };
+    /** ExamStart */
+    ExamStart: {
+      /**
+       * Actual At
+       * Format: date-time
+       */
+      actual_at: string;
+      /** Expected Version */
+      expected_version: number;
+    };
     /**
      * ExamStatus
      * @enum {string}
      */
     ExamStatus: "draft" | "scheduled" | "in_progress" | "final" | "cancelled";
+    /** ExamSummaryResponse */
+    ExamSummaryResponse: {
+      /** Assessed Item Count */
+      assessed_item_count: number;
+      /** D Status */
+      d_status: string;
+      exam: components["schemas"]["ExamResponse"];
+      /** Missing Requirements */
+      missing_requirements: string[];
+      /** Total Item Count */
+      total_item_count: number;
+    };
     /** ExamUpdate */
     ExamUpdate: {
       /** Expected Version */
@@ -2183,6 +2357,8 @@ export interface components {
     };
     /** PackagePolicyResponse */
     PackagePolicyResponse: {
+      /** Aggregation Method */
+      aggregation_method?: string | null;
       /** Approved */
       approved: boolean;
       /** Blockers */
@@ -2755,6 +2931,17 @@ export interface components {
       /** Version */
       version?: number | null;
     };
+    /** SuccessEnvelope[ExamSummaryResponse] */
+    SuccessEnvelope_ExamSummaryResponse_: {
+      data: components["schemas"]["ExamSummaryResponse"];
+      /**
+       * Request Id
+       * Format: uuid
+       */
+      request_id: string;
+      /** Version */
+      version?: number | null;
+    };
     /** SuccessEnvelope[GenericAuthResponse] */
     SuccessEnvelope_GenericAuthResponse_: {
       data: components["schemas"]["GenericAuthResponse"];
@@ -2905,6 +3092,18 @@ export interface components {
     SuccessEnvelope_list_ExamQueueItemResponse__: {
       /** Data */
       data: components["schemas"]["ExamQueueItemResponse"][];
+      /**
+       * Request Id
+       * Format: uuid
+       */
+      request_id: string;
+      /** Version */
+      version?: number | null;
+    };
+    /** SuccessEnvelope[list[ExamResponse]] */
+    SuccessEnvelope_list_ExamResponse__: {
+      /** Data */
+      data: components["schemas"]["ExamResponse"][];
       /**
        * Request Id
        * Format: uuid
@@ -6334,6 +6533,232 @@ export interface operations {
       };
     };
   };
+  save_exam_assessment_draft_api_v1_exams__exam_id__assessment_draft_put: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description UUID unique to one logical command and payload. */
+        "Idempotency-Key": string;
+        "X-CSRF-Token"?: string | null;
+      };
+      path: {
+        exam_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExamAssessmentDraft"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_ExamResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  finalize_exam_api_v1_exams__exam_id__finalize_post: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description UUID unique to one logical command and payload. */
+        "Idempotency-Key": string;
+        "X-CSRF-Token"?: string | null;
+      };
+      path: {
+        exam_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExamFinalize"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_ExamResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
   replace_exam_items_api_v1_exams__exam_id__items_put: {
     parameters: {
       query?: never;
@@ -6447,6 +6872,224 @@ export interface operations {
       };
     };
   };
+  start_exam_api_v1_exams__exam_id__start_post: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description UUID unique to one logical command and payload. */
+        "Idempotency-Key": string;
+        "X-CSRF-Token"?: string | null;
+      };
+      path: {
+        exam_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExamStart"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_ExamResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  read_exam_summary_api_v1_exams__exam_id__summary_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        exam_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_ExamSummaryResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
   list_exam_queue_api_v1_lecturer_exam_queue_get: {
     parameters: {
       query?: never;
@@ -6465,6 +7108,109 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["SuccessEnvelope_list_ExamQueueItemResponse__"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  list_lecturer_exams_api_v1_lecturer_exams_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_list_ExamResponse__"];
         };
       };
       /** @description Bad Request */

@@ -1,6 +1,7 @@
 """Stable API schemas for policy and curriculum reference data."""
 
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -61,13 +62,18 @@ class ExamPackagePolicy(BaseModel):
     approved: bool = False
     required_item_count: int | None = Field(default=None, ge=1)
     expected_total_weight: int | None = Field(default=None, ge=1, le=100)
+    aggregation_method: Literal["simple_average", "weighted_average"] | None = None
 
     @model_validator(mode="after")
     def require_approved_values(self) -> ExamPackagePolicy:
         if self.approved and (
-            self.required_item_count is None or self.expected_total_weight is None
+            self.required_item_count is None
+            or self.expected_total_weight is None
+            or self.aggregation_method is None
         ):
-            raise ValueError("approved exam package policy requires item count and total weight")
+            raise ValueError(
+                "approved exam package policy requires item count, total weight, and aggregation"
+            )
         return self
 
 

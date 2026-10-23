@@ -42,6 +42,29 @@ export type ExamItem = {
   weight: string | null;
 };
 
+export type ExamIncident = {
+  id: string;
+  location_text: string;
+  primary_category: string;
+  context: string | null;
+  assistance: "none" | "cue" | "answer";
+  self_corrected: boolean;
+  counted: boolean;
+  counting_reason: string | null;
+  note: string | null;
+};
+
+export type ExamAssessment = {
+  assessment_id: string;
+  exam_item_id: string;
+  sequence_no: number;
+  status: "draft" | "final" | "superseded" | "needs_review";
+  manual_score: number | null;
+  notes: string | null;
+  incidents: ExamIncident[];
+  row_version: number;
+};
+
 export type Exam = {
   id: string;
   participant: ExamQueueItem["participant"];
@@ -57,11 +80,23 @@ export type Exam = {
     approved: boolean;
     required_item_count: number | null;
     expected_total_weight: string | null;
+    aggregation_method: "simple_average" | "weighted_average" | null;
     blockers: string[];
   };
+  assessments: ExamAssessment[];
+  d_score: string | null;
+  evidence_media_ids: string[];
   row_version: number;
   finalized_at: string | null;
   allowed_actions: string[];
+};
+
+export type ExamSummary = {
+  exam: Exam;
+  assessed_item_count: number;
+  total_item_count: number;
+  d_status: "available" | "policy_pending";
+  missing_requirements: string[];
 };
 
 export const examStatusLabel: Record<ExamStatus, string> = {

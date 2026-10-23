@@ -28,6 +28,7 @@ from app.db.base import Base, TimestampMixin, UTCDateTime, UUIDPrimaryKeyMixin
 if TYPE_CHECKING:
     from app.modules.cohorts.models import Enrollment
     from app.modules.curriculum.models import PolicyVersion
+    from app.modules.exams.models import ExamItem
     from app.modules.identity.models import User
     from app.modules.media.models import MediaAsset
     from app.modules.mentoring.models import SessionTheme
@@ -136,6 +137,9 @@ class AssessmentRecord(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         back_populates="assessment", uselist=False
     )
     video_assessment: Mapped[VideoAssessment | None] = relationship(
+        back_populates="assessment", uselist=False
+    )
+    exam_assessment: Mapped[ExamAssessment | None] = relationship(
         back_populates="assessment", uselist=False
     )
     incidents: Mapped[list[Incident]] = relationship(
@@ -274,3 +278,25 @@ class VideoAssessment(Base):
     video_version: Mapped[VideoVersion] = relationship()
     eligibility_review: Mapped[EligibilityReview] = relationship()
     audio_asset: Mapped[MediaAsset | None] = relationship()
+
+
+class ExamAssessment(Base):
+    """One lecturer score and evidence set for an immutable exam item."""
+
+    __tablename__ = "exam_assessments"
+    __table_args__ = (
+        CheckConstraint("notes IS NULL OR length(btrim(notes)) > 0", name="notes_not_blank"),
+        UniqueConstraint("exam_item_id", name="uq_exam_assessments__exam_item_id"),
+        {"schema": "app"},
+    )
+
+    id: Mapped[UUID] = mapped_column(
+        ForeignKey("app.assessment_records.id", ondelete="RESTRICT"), primary_key=True
+    )
+    exam_item_id: Mapped[UUID] = mapped_column(
+        ForeignKey("app.exam_items.id", ondelete="RESTRICT"), nullable=False
+    )
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    assessment: Mapped[AssessmentRecord] = relationship(back_populates="exam_assessment")
+    exam_item: Mapped[ExamItem] = relationship(back_populates="assessment")

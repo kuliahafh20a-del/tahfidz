@@ -19,16 +19,20 @@ from app.modules.exams.models import (
 )
 from app.modules.exams.router import get_exam_package_service
 from app.modules.exams.schemas import (
+    ExamAssessmentDraft,
     ExamCreate,
+    ExamFinalize,
     ExamItemsReplace,
     ExamQueueItemResponse,
     ExamResponse,
+    ExamStart,
+    ExamSummaryResponse,
     ExamUpdate,
     PackagePolicyResponse,
     QuestionVersionCreate,
     QuestionVersionResponse,
 )
-from app.modules.exams.service import ExamVersionConflictError
+from app.modules.exams.service import ExamPolicyNotApprovedError, ExamVersionConflictError
 from app.modules.mentoring.schemas import SessionParticipant
 from app.modules.operations.models import IdempotencyRecord
 from app.modules.operations.service import IdempotencyClaim, get_idempotency_store
@@ -80,6 +84,7 @@ def exam_response(version: int = 1) -> ExamResponse:
             approved=False,
             required_item_count=None,
             expected_total_weight=None,
+            aggregation_method=None,
             blockers=["exam_package_policy_not_approved"],
         ),
         row_version=version,
@@ -101,6 +106,10 @@ class StubExamService:
                 allowed_actions=["create_exam"],
             )
         ]
+
+    async def list_exams(self, actor: LecturerActor) -> list[ExamResponse]:
+        assert actor == LECTURER
+        return [exam_response()]
 
     async def create_exam(
         self, actor: LecturerActor, payload: ExamCreate, request_id: UUID
@@ -131,6 +140,41 @@ class StubExamService:
     async def get_exam(self, actor: LecturerActor, exam_id: UUID) -> ExamResponse:
         assert actor == LECTURER and exam_id == EXAM_ID
         return exam_response()
+
+    async def start_exam(
+        self, actor: LecturerActor, exam_id: UUID, payload: ExamStart, request_id: UUID
+    ) -> ExamResponse:
+        del request_id
+        assert actor == LECTURER and exam_id == EXAM_ID and payload.expected_version == 1
+        return exam_response(2)
+
+    async def save_assessment_draft(
+        self,
+        actor: LecturerActor,
+        exam_id: UUID,
+        payload: ExamAssessmentDraft,
+        request_id: UUID,
+    ) -> ExamResponse:
+        del request_id
+        assert actor == LECTURER and exam_id == EXAM_ID
+        assert payload.items[0].manual_score == 8
+        return exam_response(2)
+
+    async def finalize_exam(
+        self, actor: LecturerActor, exam_id: UUID, payload: ExamFinalize, request_id: UUID
+    ) -> ExamResponse:
+        del actor, exam_id, payload, request_id
+        raise ExamPolicyNotApprovedError("exam_package_policy_not_approved")
+
+    async def exam_summary(self, actor: LecturerActor, exam_id: UUID) -> ExamSummaryResponse:
+        assert actor == LECTURER and exam_id == EXAM_ID
+        return ExamSummaryResponse(
+            exam=exam_response(),
+            assessed_item_count=0,
+            total_item_count=0,
+            d_status="policy_pending",
+            missing_requirements=["exam_package_policy_not_approved"],
+        )
 
     async def list_questions(self, actor: LecturerActor) -> list[QuestionVersionResponse]:
         assert actor == LECTURER
@@ -178,10 +222,15 @@ def test_exam_models_register_snapshot_and_version_constraints() -> None:
     questions = Base.metadata.tables["app.question_versions"]
     exams = Base.metadata.tables["app.exams"]
     items = Base.metadata.tables["app.exam_items"]
+    assessments = Base.metadata.tables["app.exam_assessments"]
 
     assert QuestionVersion.__table__ is questions
     assert Exam.__table__ is exams
     assert ExamItem.__table__ is items
+    assert any(
+        constraint.name == "uq_exam_assessments__exam_item_id"
+        for constraint in assessments.constraints
+    )
     assert any(
         constraint.name == "uq_question_versions__question_key_version_no"
         for constraint in questions.constraints
@@ -223,6 +272,109 @@ def test_lecturer_queue_question_and_package_contracts() -> None:
     assert created.json()["data"]["package_policy"]["approved"] is False
     assert question.json()["data"]["answer_reference"]["ayah_end"] == 4
     assert items.json()["version"] == 2
+
+
+def test_exam_execution_and_summary_contracts() -> None:
+    with client() as test_client:
+        exams = test_client.get("/api/v1/lecturer/exams")
+        started = test_client.post(
+            f"/api/v1/exams/{EXAM_ID}/start",
+            headers={"Idempotency-Key": str(KEY)},
+            json={"actual_at": NOW.isoformat(), "expected_version": 1},
+        )
+        draft = test_client.put(
+            f"/api/v1/exams/{EXAM_ID}/assessment-draft",
+            headers={"Idempotency-Key": str(UUID(int=KEY.int + 1))},
+            json={
+                "items": [
+                    {
+                        "exam_item_id": str(QUESTION_ID),
+                        "manual_score": 8,
+                        "notes": "Lancar",
+                        "incidents": [],
+                    }
+                ],
+                "expected_version": 1,
+            },
+        )
+        summary = test_client.get(f"/api/v1/exams/{EXAM_ID}/summary")
+
+    assert exams.status_code == 200
+    assert started.json()["version"] == 2
+    assert draft.status_code == 200
+    assert summary.json()["data"]["d_status"] == "policy_pending"
+
+
+def test_exam_scores_must_be_integer_and_within_scale() -> None:
+    with client() as test_client:
+        fractional = test_client.put(
+            f"/api/v1/exams/{EXAM_ID}/assessment-draft",
+            headers={"Idempotency-Key": str(KEY)},
+            json={
+                "items": [
+                    {
+                        "exam_item_id": str(QUESTION_ID),
+                        "manual_score": 7.5,
+                        "incidents": [],
+                    }
+                ],
+                "expected_version": 1,
+            },
+        )
+
+    assert fractional.status_code == 422
+
+
+def test_exam_finalization_reports_unapproved_policy() -> None:
+    with client() as test_client:
+        result = test_client.post(
+            f"/api/v1/exams/{EXAM_ID}/finalize",
+            headers={"Idempotency-Key": str(KEY)},
+            json={
+                "actual_at": NOW.isoformat(),
+                "manual_score": None,
+                "examiner_note": None,
+                "evidence_media_ids": [str(UUID(int=10))],
+                "expected_version": 1,
+            },
+        )
+
+    assert result.status_code == 409
+    assert result.json()["code"] == "POLICY_NOT_APPROVED"
+    assert result.json()["details"]["blockers"] == ["exam_package_policy_not_approved"]
+
+
+def test_assessment_draft_version_conflict_exposes_current_version() -> None:
+    class StaleService(StubExamService):
+        async def save_assessment_draft(
+            self,
+            actor: LecturerActor,
+            exam_id: UUID,
+            payload: ExamAssessmentDraft,
+            request_id: UUID,
+        ) -> ExamResponse:
+            del actor, exam_id, payload, request_id
+            raise ExamVersionConflictError(3)
+
+    with client(StaleService()) as test_client:
+        result = test_client.put(
+            f"/api/v1/exams/{EXAM_ID}/assessment-draft",
+            headers={"Idempotency-Key": str(KEY)},
+            json={
+                "items": [
+                    {
+                        "exam_item_id": str(QUESTION_ID),
+                        "manual_score": 8,
+                        "incidents": [],
+                    }
+                ],
+                "expected_version": 1,
+            },
+        )
+
+    assert result.status_code == 409
+    assert result.json()["code"] == "EXAM_VERSION_CONFLICT"
+    assert result.json()["details"]["current_version"] == 3
 
 
 def test_exam_version_conflict_exposes_current_version() -> None:

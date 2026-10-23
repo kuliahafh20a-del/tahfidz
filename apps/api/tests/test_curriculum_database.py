@@ -94,6 +94,7 @@ def test_seeded_policy_requires_integer_scores(curriculum_engine: Engine) -> Non
         "approved": False,
         "required_item_count": None,
         "expected_total_weight": None,
+        "aggregation_method": None,
     }
 
 

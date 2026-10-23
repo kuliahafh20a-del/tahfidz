@@ -13,10 +13,14 @@ from app.modules.auth.access import CsrfProtectionDependency
 from app.modules.cohorts.router import raise_idempotency_error
 from app.modules.exams.access import LecturerActorDependency
 from app.modules.exams.schemas import (
+    ExamAssessmentDraft,
     ExamCreate,
+    ExamFinalize,
     ExamItemsReplace,
     ExamQueueItemResponse,
     ExamResponse,
+    ExamStart,
+    ExamSummaryResponse,
     ExamUpdate,
     QuestionVersionCreate,
     QuestionVersionResponse,
@@ -25,6 +29,7 @@ from app.modules.exams.service import (
     ExamConflictError,
     ExamNotFoundError,
     ExamPackageService,
+    ExamPolicyNotApprovedError,
     ExamVersionConflictError,
 )
 from app.modules.operations.service import (
@@ -61,6 +66,15 @@ def raise_exam_error(error: Exception) -> NoReturn:
                 "details": {"current_version": error.current_version},
             },
         ) from error
+    if isinstance(error, ExamPolicyNotApprovedError):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail={
+                "code": "POLICY_NOT_APPROVED",
+                "message": "Finalisasi menunggu pengesahan DEC-002.",
+                "details": {"blockers": str(error).split(",")},
+            },
+        ) from error
     raise HTTPException(
         status_code=status.HTTP_409_CONFLICT,
         detail={"code": "PREREQUISITE_NOT_MET", "message": str(error)},
@@ -78,6 +92,16 @@ async def list_exam_queue(
 ) -> SuccessEnvelope[list[ExamQueueItemResponse]]:
     require_query_allowlist(request, set())
     return success(request, await service.list_queue(actor))
+
+
+@router.get("/lecturer/exams", response_model=SuccessEnvelope[list[ExamResponse]])
+async def list_lecturer_exams(
+    request: Request,
+    actor: LecturerActorDependency,
+    service: ExamPackageServiceDependency,
+) -> SuccessEnvelope[list[ExamResponse]]:
+    require_query_allowlist(request, set())
+    return success(request, await service.list_exams(actor))
 
 
 @router.get(
@@ -252,3 +276,122 @@ async def replace_exam_items(
         raise_idempotency_error(error)
     except (ExamNotFoundError, ExamConflictError) as error:
         raise_exam_error(error)
+
+
+@router.post("/exams/{exam_id}/start", response_model=SuccessEnvelope[ExamResponse])
+async def start_exam(
+    exam_id: UUID,
+    payload: ExamStart,
+    request: Request,
+    actor: LecturerActorDependency,
+    service: ExamPackageServiceDependency,
+    idempotency: IdempotencyStoreDependency,
+    idempotency_key: IdempotencyKey,
+    _csrf: CsrfProtectionDependency,
+) -> SuccessEnvelope[ExamResponse]:
+    try:
+        claim = await idempotency.claim(
+            actor_id=actor.user_id,
+            idempotency_key=idempotency_key,
+            method=request.method,
+            normalized_path=request.url.path,
+            payload=payload.model_dump(mode="json"),
+            request_id=request_id(request),
+        )
+        if claim.replay_body is not None:
+            result = ExamResponse.model_validate(claim.replay_body)
+        else:
+            result = await service.start_exam(actor, exam_id, payload, request_id(request))
+            await idempotency.complete(
+                claim, response_body=result.model_dump(mode="json"), response_status=200
+            )
+        return success(request, result, version=result.row_version)
+    except (IdempotencyKeyReusedError, IdempotencyRequestInProgressError) as error:
+        raise_idempotency_error(error)
+    except (ExamNotFoundError, ExamConflictError) as error:
+        raise_exam_error(error)
+
+
+@router.put("/exams/{exam_id}/assessment-draft", response_model=SuccessEnvelope[ExamResponse])
+async def save_exam_assessment_draft(
+    exam_id: UUID,
+    payload: ExamAssessmentDraft,
+    request: Request,
+    actor: LecturerActorDependency,
+    service: ExamPackageServiceDependency,
+    idempotency: IdempotencyStoreDependency,
+    idempotency_key: IdempotencyKey,
+    _csrf: CsrfProtectionDependency,
+) -> SuccessEnvelope[ExamResponse]:
+    try:
+        claim = await idempotency.claim(
+            actor_id=actor.user_id,
+            idempotency_key=idempotency_key,
+            method=request.method,
+            normalized_path=request.url.path,
+            payload=payload.model_dump(mode="json"),
+            request_id=request_id(request),
+        )
+        if claim.replay_body is not None:
+            result = ExamResponse.model_validate(claim.replay_body)
+        else:
+            result = await service.save_assessment_draft(
+                actor, exam_id, payload, request_id(request)
+            )
+            await idempotency.complete(
+                claim, response_body=result.model_dump(mode="json"), response_status=200
+            )
+        return success(request, result, version=result.row_version)
+    except (IdempotencyKeyReusedError, IdempotencyRequestInProgressError) as error:
+        raise_idempotency_error(error)
+    except (ExamNotFoundError, ExamConflictError) as error:
+        raise_exam_error(error)
+
+
+@router.post("/exams/{exam_id}/finalize", response_model=SuccessEnvelope[ExamResponse])
+async def finalize_exam(
+    exam_id: UUID,
+    payload: ExamFinalize,
+    request: Request,
+    actor: LecturerActorDependency,
+    service: ExamPackageServiceDependency,
+    idempotency: IdempotencyStoreDependency,
+    idempotency_key: IdempotencyKey,
+    _csrf: CsrfProtectionDependency,
+) -> SuccessEnvelope[ExamResponse]:
+    try:
+        claim = await idempotency.claim(
+            actor_id=actor.user_id,
+            idempotency_key=idempotency_key,
+            method=request.method,
+            normalized_path=request.url.path,
+            payload=payload.model_dump(mode="json"),
+            request_id=request_id(request),
+        )
+        if claim.replay_body is not None:
+            result = ExamResponse.model_validate(claim.replay_body)
+        else:
+            result = await service.finalize_exam(actor, exam_id, payload, request_id(request))
+            await idempotency.complete(
+                claim, response_body=result.model_dump(mode="json"), response_status=200
+            )
+        return success(request, result, version=result.row_version)
+    except (IdempotencyKeyReusedError, IdempotencyRequestInProgressError) as error:
+        raise_idempotency_error(error)
+    except (ExamNotFoundError, ExamConflictError) as error:
+        raise_exam_error(error)
+
+
+@router.get("/exams/{exam_id}/summary", response_model=SuccessEnvelope[ExamSummaryResponse])
+async def read_exam_summary(
+    exam_id: UUID,
+    request: Request,
+    actor: LecturerActorDependency,
+    service: ExamPackageServiceDependency,
+) -> SuccessEnvelope[ExamSummaryResponse]:
+    require_query_allowlist(request, set())
+    try:
+        result = await service.exam_summary(actor, exam_id)
+    except ExamNotFoundError as error:
+        raise_exam_error(error)
+    return success(request, result, version=result.exam.row_version)
