@@ -1,1 +1,1 @@
-"""Exams domain boundary."""
+"""Lecturer exam queue and question package domain."""

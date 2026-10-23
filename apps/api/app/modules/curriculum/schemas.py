@@ -55,12 +55,29 @@ class VideoAssessmentPolicy(BaseModel):
     maximum_errors_for_enough: int = Field(default=3, ge=0)
 
 
+class ExamPackagePolicy(BaseModel):
+    """Open DEC-002 package settings; unapproved values cannot enable an exam."""
+
+    approved: bool = False
+    required_item_count: int | None = Field(default=None, ge=1)
+    expected_total_weight: int | None = Field(default=None, ge=1, le=100)
+
+    @model_validator(mode="after")
+    def require_approved_values(self) -> ExamPackagePolicy:
+        if self.approved and (
+            self.required_item_count is None or self.expected_total_weight is None
+        ):
+            raise ValueError("approved exam package policy requires item count and total weight")
+        return self
+
+
 class PolicyRules(BaseModel):
     """Validated JSON document stored by a policy version."""
 
     schema_version: int = 1
     score: IntegerScorePolicy
     video_assessment: VideoAssessmentPolicy = Field(default_factory=VideoAssessmentPolicy)
+    exam_package: ExamPackagePolicy = Field(default_factory=ExamPackagePolicy)
 
 
 class PolicySummary(BaseModel):
