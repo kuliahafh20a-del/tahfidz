@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import UTC, date, datetime
+from decimal import Decimal
 from uuid import UUID
 
 from fastapi.testclient import TestClient
@@ -15,6 +16,11 @@ from app.modules.calendar.schemas import (
     ProgressResponse,
     TargetResponse,
     TargetTheme,
+)
+from app.modules.grading.schemas import (
+    ActivityScoreResponse,
+    ActivitySourceContext,
+    ActivityThemeScore,
 )
 
 ACTOR = ParticipantActor(
@@ -95,6 +101,30 @@ class StubParticipantTargetService:
             upcoming_targets=[target()],
         )
 
+    async def activity_score(self, actor: ParticipantActor) -> ActivityScoreResponse:
+        assert actor == ACTOR
+        first_submission = datetime(2027, 1, 1, 2, tzinfo=UTC)
+        return ActivityScoreResponse(
+            value=Decimal("10.000"),
+            is_final=False,
+            source_context=ActivitySourceContext(
+                cutoff_at=datetime(2027, 1, 2, tzinfo=UTC),
+                total_target_count=44,
+                scored_target_count=1,
+                overdue_target_count=0,
+                themes=[
+                    ActivityThemeScore(
+                        target_id=TARGET_ID,
+                        theme_id=THEME_ID,
+                        effective_due_date=date(2027, 1, 1),
+                        first_valid_submission_at=first_submission,
+                        days_late=0,
+                        score=10,
+                    )
+                ],
+            ),
+        )
+
 
 def participant_client() -> TestClient:
     application = create_app()
@@ -131,3 +161,16 @@ def test_participant_progress_exposes_44_theme_projection() -> None:
 
     assert response.status_code == 200
     assert response.json()["data"]["total_targets"] == 44
+
+
+def test_participant_activity_score_exposes_auditable_source_context() -> None:
+    with participant_client() as client:
+        response = client.get("/api/v1/me/activity-score")
+
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "no-store"
+    assert response.json()["data"]["value"] == "10.000"
+    context = response.json()["data"]["source_context"]
+    assert context["timezone"] == "Asia/Jakarta"
+    assert context["scored_target_count"] == 1
+    assert context["themes"][0]["score"] == 10

@@ -523,6 +523,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/me/activity-score": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Activity Score */
+    get: operations["activity_score_api_v1_me_activity_score_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/me/dashboard": {
     parameters: {
       query?: never;
@@ -1257,6 +1274,60 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** ActivityScoreResponse */
+    ActivityScoreResponse: {
+      /** Is Final */
+      is_final: boolean;
+      source_context: components["schemas"]["ActivitySourceContext"];
+      /** Value */
+      value: string | null;
+    };
+    /** ActivitySourceContext */
+    ActivitySourceContext: {
+      /**
+       * Cutoff At
+       * Format: date-time
+       */
+      cutoff_at: string;
+      /** Overdue Target Count */
+      overdue_target_count: number;
+      /** Scored Target Count */
+      scored_target_count: number;
+      /** Themes */
+      themes: components["schemas"]["ActivityThemeScore"][];
+      /**
+       * Timezone
+       * @default Asia/Jakarta
+       * @constant
+       */
+      timezone: "Asia/Jakarta";
+      /** Total Target Count */
+      total_target_count: number;
+    };
+    /** ActivityThemeScore */
+    ActivityThemeScore: {
+      /** Days Late */
+      days_late: number | null;
+      /**
+       * Effective Due Date
+       * Format: date
+       */
+      effective_due_date: string;
+      /** First Valid Submission At */
+      first_valid_submission_at: string | null;
+      /** Score */
+      score: number | null;
+      /**
+       * Target Id
+       * Format: uuid
+       */
+      target_id: string;
+      /**
+       * Theme Id
+       * Format: uuid
+       */
+      theme_id: string;
+    };
     /**
      * AssessmentRubricResponse
      * @description The effective score policy used by assessment forms.
@@ -2721,6 +2792,17 @@ export interface components {
       login_identifier: string;
       /** Roles */
       roles: components["schemas"]["RoleContext"][];
+    };
+    /** SuccessEnvelope[ActivityScoreResponse] */
+    SuccessEnvelope_ActivityScoreResponse_: {
+      data: components["schemas"]["ActivityScoreResponse"];
+      /**
+       * Request Id
+       * Format: uuid
+       */
+      request_id: string;
+      /** Version */
+      version?: number | null;
     };
     /** SuccessEnvelope[AssessmentRubricResponse] */
     SuccessEnvelope_AssessmentRubricResponse_: {
@@ -7425,6 +7507,109 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["SuccessEnvelope_QuestionVersionResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  activity_score_api_v1_me_activity_score_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_ActivityScoreResponse_"];
         };
       };
       /** @description Bad Request */

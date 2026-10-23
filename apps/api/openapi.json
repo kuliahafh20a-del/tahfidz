@@ -1,6 +1,137 @@
 {
   "components": {
     "schemas": {
+      "ActivityScoreResponse": {
+        "properties": {
+          "is_final": {
+            "title": "Is Final",
+            "type": "boolean"
+          },
+          "source_context": {
+            "$ref": "#/components/schemas/ActivitySourceContext"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": ["value", "is_final", "source_context"],
+        "title": "ActivityScoreResponse",
+        "type": "object"
+      },
+      "ActivitySourceContext": {
+        "properties": {
+          "cutoff_at": {
+            "format": "date-time",
+            "title": "Cutoff At",
+            "type": "string"
+          },
+          "overdue_target_count": {
+            "title": "Overdue Target Count",
+            "type": "integer"
+          },
+          "scored_target_count": {
+            "title": "Scored Target Count",
+            "type": "integer"
+          },
+          "themes": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityThemeScore"
+            },
+            "title": "Themes",
+            "type": "array"
+          },
+          "timezone": {
+            "const": "Asia/Jakarta",
+            "default": "Asia/Jakarta",
+            "title": "Timezone",
+            "type": "string"
+          },
+          "total_target_count": {
+            "title": "Total Target Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "cutoff_at",
+          "total_target_count",
+          "scored_target_count",
+          "overdue_target_count",
+          "themes"
+        ],
+        "title": "ActivitySourceContext",
+        "type": "object"
+      },
+      "ActivityThemeScore": {
+        "properties": {
+          "days_late": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Late"
+          },
+          "effective_due_date": {
+            "format": "date",
+            "title": "Effective Due Date",
+            "type": "string"
+          },
+          "first_valid_submission_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Valid Submission At"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "target_id": {
+            "format": "uuid",
+            "title": "Target Id",
+            "type": "string"
+          },
+          "theme_id": {
+            "format": "uuid",
+            "title": "Theme Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_id",
+          "theme_id",
+          "effective_due_date",
+          "first_valid_submission_at",
+          "days_late",
+          "score"
+        ],
+        "title": "ActivityThemeScore",
+        "type": "object"
+      },
       "AssessmentRubricResponse": {
         "description": "The effective score policy used by assessment forms.",
         "properties": {
@@ -3269,6 +3400,32 @@
         },
         "required": ["id", "display_name", "login_identifier", "roles"],
         "title": "SessionUser",
+        "type": "object"
+      },
+      "SuccessEnvelope_ActivityScoreResponse_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ActivityScoreResponse"
+          },
+          "request_id": {
+            "format": "uuid",
+            "title": "Request Id",
+            "type": "string"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          }
+        },
+        "required": ["data", "request_id"],
+        "title": "SuccessEnvelope[ActivityScoreResponse]",
         "type": "object"
       },
       "SuccessEnvelope_AssessmentRubricResponse_": {
@@ -10933,6 +11090,133 @@
         },
         "summary": "Create Exam Question",
         "tags": ["lecturer exams"]
+      }
+    },
+    "/api/v1/me/activity-score": {
+      "get": {
+        "operationId": "activity_score_api_v1_me_activity_score_get",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "yaqin_session",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Yaqin Session"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessEnvelope_ActivityScoreResponse_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Activity Score",
+        "tags": ["participant"]
       }
     },
     "/api/v1/me/dashboard": {
