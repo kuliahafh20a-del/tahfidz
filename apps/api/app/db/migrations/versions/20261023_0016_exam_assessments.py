@@ -30,13 +30,13 @@ def upgrade() -> None:
         schema="app",
     )
     op.create_check_constraint(
-        "ck_exams__d_score_range",
+        "d_score_range",
         "exams",
         "d_score IS NULL OR d_score BETWEEN 1 AND 10",
         schema="app",
     )
     op.create_check_constraint(
-        "ck_exams__evidence_media_ids_array",
+        "evidence_media_ids_array",
         "exams",
         "jsonb_typeof(evidence_media_ids) = 'array'",
         schema="app",
