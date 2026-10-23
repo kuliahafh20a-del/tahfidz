@@ -41,6 +41,7 @@ def test_policy_rules_accept_the_approved_integer_scale() -> None:
     assert rules.score.step == 1
     assert rules.score.allow_fractional is False
     assert rules.score.display_decimals == 0
+    assert rules.video_assessment.maximum_errors_for_enough == 3
 
 
 @pytest.mark.parametrize(

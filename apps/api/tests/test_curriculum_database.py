@@ -89,6 +89,7 @@ def test_seeded_policy_requires_integer_scores(curriculum_engine: Engine) -> Non
     assert policy["rules"]["score"]["step"] == 1
     assert policy["rules"]["score"]["allow_fractional"] is False
     assert policy["rules"]["score"]["display_decimals"] == 0
+    assert policy["rules"]["video_assessment"]["maximum_errors_for_enough"] == 3
 
 
 @pytest.mark.migration

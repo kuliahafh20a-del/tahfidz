@@ -1,0 +1,53 @@
+.card,
+.card header,
+.card dl,
+.audio {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.card header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.card h3,
+.card p {
+  margin: 0;
+}
+.card header p,
+.card > p,
+.card dt {
+  color: var(--text-secondary);
+}
+
+.card dl {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+}
+
+.card dl div {
+  display: grid;
+  gap: var(--space-1);
+}
+.card dd {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+.card audio {
+  width: 100%;
+}
+.audio small {
+  color: var(--danger-700);
+}
+.card li + li {
+  margin-top: var(--space-2);
+}
+
+@media (max-width: 47.9375rem) {
+  .card header,
+  .card dl {
+    grid-template-columns: 1fr;
+  }
+}
