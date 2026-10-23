@@ -334,6 +334,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/enrollments/{enrollment_id}/video-assessment-history": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read Video Assessment History */
+    get: operations["read_video_assessment_history_api_v1_enrollments__enrollment_id__video_assessment_history_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/me/dashboard": {
     parameters: {
       query?: never;
@@ -413,6 +430,40 @@ export interface paths {
     get: operations["list_my_theme_results_api_v1_me_theme_results_get"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/video-assessment-results": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List My Video Assessment Results */
+    get: operations["list_my_video_assessment_results_api_v1_me_video_assessment_results_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/me/video-assessments/{assessment_id}/audio/playback-url": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Participant Video Assessment Audio */
+    post: operations["participant_video_assessment_audio_api_v1_me_video_assessments__assessment_id__audio_playback_url_post"];
     delete?: never;
     options?: never;
     head?: never;
@@ -564,6 +615,23 @@ export interface paths {
     };
     /** Read Mentor Session */
     get: operations["read_mentor_session_api_v1_mentor_sessions__session_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/mentor/video-assessments": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Mentor Video Assessments */
+    get: operations["list_mentor_video_assessments_api_v1_mentor_video_assessments_get"];
     put?: never;
     post?: never;
     delete?: never;
@@ -805,6 +873,58 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/video-assessments/{assessment_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read Video Assessment */
+    get: operations["read_video_assessment_api_v1_video_assessments__assessment_id__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Update Video Assessment */
+    patch: operations["update_video_assessment_api_v1_video_assessments__assessment_id__patch"];
+    trace?: never;
+  };
+  "/api/v1/video-assessments/{assessment_id}/audio/playback-url": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Mentor Video Assessment Audio */
+    post: operations["mentor_video_assessment_audio_api_v1_video_assessments__assessment_id__audio_playback_url_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/video-assessments/{assessment_id}/finalize": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Finalize Video Assessment */
+    post: operations["finalize_video_assessment_api_v1_video_assessments__assessment_id__finalize_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/video-attempts": {
     parameters: {
       query?: never;
@@ -867,6 +987,23 @@ export interface paths {
     get: operations["read_video_version_api_v1_video_versions__video_version_id__get"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/video-versions/{video_version_id}/assessment": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create Video Assessment */
+    post: operations["create_video_assessment_api_v1_video_versions__video_version_id__assessment_post"];
     delete?: never;
     options?: never;
     head?: never;
@@ -2394,6 +2531,28 @@ export interface components {
       /** Version */
       version?: number | null;
     };
+    /** SuccessEnvelope[VideoAssessmentPlayback] */
+    SuccessEnvelope_VideoAssessmentPlayback_: {
+      data: components["schemas"]["VideoAssessmentPlayback"];
+      /**
+       * Request Id
+       * Format: uuid
+       */
+      request_id: string;
+      /** Version */
+      version?: number | null;
+    };
+    /** SuccessEnvelope[VideoAssessmentResponse] */
+    SuccessEnvelope_VideoAssessmentResponse_: {
+      data: components["schemas"]["VideoAssessmentResponse"];
+      /**
+       * Request Id
+       * Format: uuid
+       */
+      request_id: string;
+      /** Version */
+      version?: number | null;
+    };
     /** SuccessEnvelope[VideoAttemptResponse] */
     SuccessEnvelope_VideoAttemptResponse_: {
       data: components["schemas"]["VideoAttemptResponse"];
@@ -2434,6 +2593,18 @@ export interface components {
     SuccessEnvelope_list_ThemeAssessmentResponse__: {
       /** Data */
       data: components["schemas"]["ThemeAssessmentResponse"][];
+      /**
+       * Request Id
+       * Format: uuid
+       */
+      request_id: string;
+      /** Version */
+      version?: number | null;
+    };
+    /** SuccessEnvelope[list[VideoAssessmentResponse]] */
+    SuccessEnvelope_list_VideoAssessmentResponse__: {
+      /** Data */
+      data: components["schemas"]["VideoAssessmentResponse"][];
       /**
        * Request Id
        * Format: uuid
@@ -2648,6 +2819,131 @@ export interface components {
       login_identifier: string;
       /** Name */
       name: string;
+    };
+    /** VideoAssessmentAudio */
+    VideoAssessmentAudio: {
+      /** File Name */
+      file_name: string;
+      /**
+       * Id
+       * Format: uuid
+       */
+      id: string;
+      status: components["schemas"]["MediaAssetStatus"];
+    };
+    /** VideoAssessmentDraftCreate */
+    VideoAssessmentDraftCreate: {
+      /** Feedback Audio Id */
+      feedback_audio_id?: string | null;
+      /** Incidents */
+      incidents?: components["schemas"]["IncidentInput"][];
+      /** Manual Score */
+      manual_score?: number | null;
+      /** Mentor Note */
+      mentor_note?: string | null;
+    };
+    /** VideoAssessmentDraftUpdate */
+    VideoAssessmentDraftUpdate: {
+      /** Expected Version */
+      expected_version: number;
+      /** Feedback Audio Id */
+      feedback_audio_id?: string | null;
+      /** Incidents */
+      incidents?: components["schemas"]["IncidentInput"][];
+      /** Manual Score */
+      manual_score?: number | null;
+      /** Mentor Note */
+      mentor_note?: string | null;
+    };
+    /** VideoAssessmentFinalize */
+    VideoAssessmentFinalize: {
+      /** Expected Version */
+      expected_version: number;
+    };
+    /**
+     * VideoAssessmentOutcome
+     * @enum {string}
+     */
+    VideoAssessmentOutcome: "enough" | "not_enough";
+    /** VideoAssessmentPlayback */
+    VideoAssessmentPlayback: {
+      /**
+       * Assessment Id
+       * Format: uuid
+       */
+      assessment_id: string;
+      /**
+       * Expires At
+       * Format: date-time
+       */
+      expires_at: string;
+      /** Playback Url */
+      playback_url: string;
+    };
+    /** VideoAssessmentResponse */
+    VideoAssessmentResponse: {
+      /**
+       * Actual At
+       * Format: date-time
+       */
+      actual_at: string;
+      /** Allowed Actions */
+      allowed_actions: string[];
+      /**
+       * Assessment Id
+       * Format: uuid
+       */
+      assessment_id: string;
+      /** Counted Errors */
+      counted_errors: number;
+      /** Cycle No */
+      cycle_no: number;
+      /**
+       * Eligibility Review Id
+       * Format: uuid
+       */
+      eligibility_review_id: string;
+      feedback_audio: components["schemas"]["VideoAssessmentAudio"] | null;
+      /** Finalized At */
+      finalized_at: string | null;
+      /** Incidents */
+      incidents: components["schemas"]["IncidentResponse"][];
+      /** Manual Score */
+      manual_score: number | null;
+      /** Mentor Note */
+      mentor_note: string | null;
+      outcome: components["schemas"]["VideoAssessmentOutcome"] | null;
+      /**
+       * Part Id
+       * Format: uuid
+       */
+      part_id: string;
+      /** Part Name */
+      part_name: string;
+      /** Part No */
+      part_no: number;
+      participant: components["schemas"]["SessionParticipant"];
+      /** Policy Version */
+      policy_version: string;
+      /**
+       * Policy Version Id
+       * Format: uuid
+       */
+      policy_version_id: string;
+      /** Revision No */
+      revision_no: number;
+      /** Row Version */
+      row_version: number;
+      status: components["schemas"]["AssessmentStatus"];
+      /** Video Url */
+      video_url: string;
+      /**
+       * Video Version Id
+       * Format: uuid
+       */
+      video_version_id: string;
+      /** Video Version No */
+      video_version_no: number;
     };
     /** VideoAttemptCreate */
     VideoAttemptCreate: {
@@ -5268,6 +5564,111 @@ export interface operations {
       };
     };
   };
+  read_video_assessment_history_api_v1_enrollments__enrollment_id__video_assessment_history_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        enrollment_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_list_VideoAssessmentResponse__"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
   dashboard_api_v1_me_dashboard_get: {
     parameters: {
       query?: never;
@@ -5711,6 +6112,216 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["SuccessEnvelope_CursorPage_ThemeAssessmentResponse__"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  list_my_video_assessment_results_api_v1_me_video_assessment_results_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_list_VideoAssessmentResponse__"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  participant_video_assessment_audio_api_v1_me_video_assessments__assessment_id__audio_playback_url_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-CSRF-Token"?: string | null;
+      };
+      path: {
+        assessment_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_VideoAssessmentPlayback_"];
         };
       };
       /** @description Bad Request */
@@ -6670,6 +7281,109 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["app__api__contracts__SuccessEnvelope_SessionResponse___2"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  list_mentor_video_assessments_api_v1_mentor_video_assessments_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_list_VideoAssessmentResponse__"];
         };
       };
       /** @description Bad Request */
@@ -8491,6 +9205,444 @@ export interface operations {
       };
     };
   };
+  read_video_assessment_api_v1_video_assessments__assessment_id__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        assessment_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_VideoAssessmentResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  update_video_assessment_api_v1_video_assessments__assessment_id__patch: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description UUID unique to one logical command and payload. */
+        "Idempotency-Key": string;
+        "X-CSRF-Token"?: string | null;
+      };
+      path: {
+        assessment_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VideoAssessmentDraftUpdate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_VideoAssessmentResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  mentor_video_assessment_audio_api_v1_video_assessments__assessment_id__audio_playback_url_post: {
+    parameters: {
+      query?: never;
+      header?: {
+        "X-CSRF-Token"?: string | null;
+      };
+      path: {
+        assessment_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_VideoAssessmentPlayback_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  finalize_video_assessment_api_v1_video_assessments__assessment_id__finalize_post: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description UUID unique to one logical command and payload. */
+        "Idempotency-Key": string;
+        "X-CSRF-Token"?: string | null;
+      };
+      path: {
+        assessment_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VideoAssessmentFinalize"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_VideoAssessmentResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
   create_video_attempt_api_v1_video_attempts_post: {
     parameters: {
       query?: never;
@@ -8840,6 +9992,119 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["SuccessEnvelope_VideoEligibilityResponse_"];
+        };
+      };
+      /** @description Bad Request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Unprocessable Content */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Too Many Requests */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Internal Server Error */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ErrorEnvelope"];
+        };
+      };
+    };
+  };
+  create_video_assessment_api_v1_video_versions__video_version_id__assessment_post: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description UUID unique to one logical command and payload. */
+        "Idempotency-Key": string;
+        "X-CSRF-Token"?: string | null;
+      };
+      path: {
+        video_version_id: string;
+      };
+      cookie?: {
+        yaqin_session?: string | null;
+      };
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["VideoAssessmentDraftCreate"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessEnvelope_VideoAssessmentResponse_"];
         };
       };
       /** @description Bad Request */

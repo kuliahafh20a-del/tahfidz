@@ -49,11 +49,18 @@ class IntegerScorePolicy(BaseModel):
         return self
 
 
+class VideoAssessmentPolicy(BaseModel):
+    """Rules that turn counted video incidents into an academic result."""
+
+    maximum_errors_for_enough: int = Field(default=3, ge=0)
+
+
 class PolicyRules(BaseModel):
     """Validated JSON document stored by a policy version."""
 
     schema_version: int = 1
     score: IntegerScorePolicy
+    video_assessment: VideoAssessmentPolicy = Field(default_factory=VideoAssessmentPolicy)
 
 
 class PolicySummary(BaseModel):

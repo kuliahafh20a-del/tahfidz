@@ -29,7 +29,9 @@ if TYPE_CHECKING:
     from app.modules.cohorts.models import Enrollment
     from app.modules.curriculum.models import PolicyVersion
     from app.modules.identity.models import User
+    from app.modules.media.models import MediaAsset
     from app.modules.mentoring.models import SessionTheme
+    from app.modules.video.models import EligibilityReview, VideoVersion
 
 
 class AssessmentKind(StrEnum):
@@ -55,6 +57,11 @@ class ThemeOutcome(StrEnum):
     ENOUGH = "enough"
     REPEAT = "repeat"
     FOLLOW_UP = "follow_up"
+
+
+class VideoAssessmentOutcome(StrEnum):
+    ENOUGH = "enough"
+    NOT_ENOUGH = "not_enough"
 
 
 class AssessmentRecord(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -126,6 +133,9 @@ class AssessmentRecord(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     assessor: Mapped[User] = relationship()
     policy_version: Mapped[PolicyVersion] = relationship()
     theme_assessment: Mapped[ThemeAssessment | None] = relationship(
+        back_populates="assessment", uselist=False
+    )
+    video_assessment: Mapped[VideoAssessment | None] = relationship(
         back_populates="assessment", uselist=False
     )
     incidents: Mapped[list[Incident]] = relationship(
@@ -219,3 +229,48 @@ class ThemeAssessment(Base):
 
     assessment: Mapped[AssessmentRecord] = relationship(back_populates="theme_assessment")
     session_theme: Mapped[SessionTheme] = relationship()
+
+
+class VideoAssessment(Base):
+    """Video-specific academic result authorized by a final eligibility review."""
+
+    __tablename__ = "video_assessments"
+    __table_args__ = (
+        CheckConstraint("counted_errors >= 0", name="counted_errors_nonnegative"),
+        CheckConstraint("notes IS NULL OR length(btrim(notes)) > 0", name="notes_not_blank"),
+        Index("ix_video_assessments__video_version_id", "video_version_id"),
+        {"schema": "app"},
+    )
+
+    id: Mapped[UUID] = mapped_column(
+        ForeignKey("app.assessment_records.id", ondelete="RESTRICT"), primary_key=True
+    )
+    video_version_id: Mapped[UUID] = mapped_column(
+        ForeignKey("app.video_versions.id", ondelete="RESTRICT"), nullable=False
+    )
+    eligibility_review_id: Mapped[UUID] = mapped_column(
+        ForeignKey("app.eligibility_reviews.id", ondelete="RESTRICT"), nullable=False
+    )
+    audio_asset_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("app.media_assets.id", ondelete="RESTRICT"), nullable=True
+    )
+    counted_errors: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    outcome: Mapped[VideoAssessmentOutcome | None] = mapped_column(
+        Enum(
+            VideoAssessmentOutcome,
+            name="video_assessment_outcome",
+            native_enum=False,
+            create_constraint=False,
+            values_callable=lambda members: [member.value for member in members],
+            length=16,
+        ),
+        nullable=True,
+    )
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    assessment: Mapped[AssessmentRecord] = relationship(back_populates="video_assessment")
+    video_version: Mapped[VideoVersion] = relationship()
+    eligibility_review: Mapped[EligibilityReview] = relationship()
+    audio_asset: Mapped[MediaAsset | None] = relationship()

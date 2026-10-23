@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { AppShell, PageHeader, SupportPanel, WorkSupportLayout } from "@/components/shell";
 import { Button, Card, FeedbackState, StatusBadge } from "@/components/ui";
+import { VideoAssessmentCard } from "@/components/video-assessment-card";
 import {
   assessmentStatusLabel,
   assessmentTone,
@@ -14,6 +15,7 @@ import {
   ThemeAssessment,
 } from "@/lib/assessments";
 import { apiRequest, CursorPage, dateTimeLabel, SessionContext } from "@/lib/mentoring";
+import { VideoAssessment } from "@/lib/video";
 
 import styles from "./workspace.module.css";
 
@@ -21,6 +23,7 @@ export function MentorParticipantRecapWorkspace({ enrollmentId }: { enrollmentId
   const [context, setContext] = useState<SessionContext | null>(null);
   const [participant, setParticipant] = useState<MentorParticipant | null>(null);
   const [history, setHistory] = useState<ThemeAssessment[]>([]);
+  const [videoHistory, setVideoHistory] = useState<VideoAssessment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -33,12 +36,14 @@ export function MentorParticipantRecapWorkspace({ enrollmentId }: { enrollmentId
       apiRequest<CursorPage<ThemeAssessment>>(
         `/enrollments/${enrollmentId}/assessment-history?limit=100`,
       ),
+      apiRequest<VideoAssessment[]>(`/enrollments/${enrollmentId}/video-assessment-history`),
     ])
-      .then(([loadedContext, loadedParticipant, page]) => {
+      .then(([loadedContext, loadedParticipant, page, loadedVideoHistory]) => {
         if (!active) return;
         setContext(loadedContext);
         setParticipant(loadedParticipant);
         setHistory(page.items);
+        setVideoHistory(loadedVideoHistory);
         setError(null);
       })
       .catch((caught: unknown) => {
@@ -178,6 +183,19 @@ export function MentorParticipantRecapWorkspace({ enrollmentId }: { enrollmentId
               </div>
             </Card>
           )}
+          {videoHistory.length && context ? (
+            <section className={styles.timeline}>
+              <h2>Riwayat video ({videoHistory.length})</h2>
+              {videoHistory.map((item) => (
+                <VideoAssessmentCard
+                  assessment={item}
+                  csrfToken={context.csrf_token}
+                  key={item.assessment_id}
+                  participant={false}
+                />
+              ))}
+            </section>
+          ) : null}
         </WorkSupportLayout>
       ) : null}
     </AppShell>

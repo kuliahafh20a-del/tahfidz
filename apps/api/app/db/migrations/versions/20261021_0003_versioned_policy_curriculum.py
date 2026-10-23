@@ -50,6 +50,7 @@ POLICY_RULES = {
             },
         ],
     },
+    "video_assessment": {"maximum_errors_for_enough": 3},
 }
 
 # Every inclusive range is ordered and together covers QS 78:1 through QS 114:6 once.

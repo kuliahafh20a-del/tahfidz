@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { AppShell, PageHeader, SupportPanel, WorkSupportLayout } from "@/components/shell";
 import { Button, Card, FeedbackState, StatusBadge } from "@/components/ui";
+import { VideoAssessmentCard } from "@/components/video-assessment-card";
 import {
   assessmentStatusLabel,
   assessmentTone,
@@ -13,7 +14,7 @@ import {
   ThemeAssessment,
 } from "@/lib/assessments";
 import { apiRequest, CursorPage, dateTimeLabel, SessionContext } from "@/lib/mentoring";
-import { VideoEligibility } from "@/lib/video";
+import { VideoAssessment, VideoEligibility } from "@/lib/video";
 
 import styles from "./workspace.module.css";
 
@@ -21,6 +22,7 @@ export function ParticipantResultsWorkspace() {
   const [context, setContext] = useState<SessionContext | null>(null);
   const [results, setResults] = useState<ThemeAssessment[]>([]);
   const [videoResults, setVideoResults] = useState<VideoEligibility[]>([]);
+  const [videoAssessments, setVideoAssessments] = useState<VideoAssessment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -31,12 +33,14 @@ export function ParticipantResultsWorkspace() {
       apiRequest<SessionContext>("/auth/session"),
       apiRequest<CursorPage<ThemeAssessment>>("/me/theme-results?limit=100"),
       apiRequest<VideoEligibility[]>("/me/video-results"),
+      apiRequest<VideoAssessment[]>("/me/video-assessment-results"),
     ])
-      .then(([loadedContext, page, loadedVideoResults]) => {
+      .then(([loadedContext, page, loadedVideoResults, loadedVideoAssessments]) => {
         if (!active) return;
         setContext(loadedContext);
         setResults(page.items);
         setVideoResults(loadedVideoResults);
+        setVideoAssessments(loadedVideoAssessments);
         setError(null);
       })
       .catch((caught: unknown) => {
@@ -124,6 +128,10 @@ export function ParticipantResultsWorkspace() {
                   <div>
                     <dt>Video perlu diganti</dt>
                     <dd>{technicalFollowUps.length}</dd>
+                  </div>
+                  <div>
+                    <dt>Hasil video final</dt>
+                    <dd>{videoAssessments.length}</dd>
                   </div>
                 </dl>
               </SupportPanel>
@@ -251,6 +259,20 @@ export function ParticipantResultsWorkspace() {
                 ))}
               </div>
             </Card>
+          ) : null}
+
+          {videoAssessments.length && context ? (
+            <section className={styles.results}>
+              <h2>Hasil akademik video</h2>
+              {videoAssessments.map((item) => (
+                <VideoAssessmentCard
+                  assessment={item}
+                  csrfToken={context.csrf_token}
+                  key={item.assessment_id}
+                  participant
+                />
+              ))}
+            </section>
           ) : null}
         </WorkSupportLayout>
       ) : null}
