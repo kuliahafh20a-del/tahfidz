@@ -42,6 +42,23 @@ def test_policy_rules_accept_the_approved_integer_scale() -> None:
     assert rules.score.allow_fractional is False
     assert rules.score.display_decimals == 0
     assert rules.video_assessment.maximum_errors_for_enough == 3
+    assert rules.exam_package.approved is False
+    assert rules.exam_package.required_item_count is None
+    assert rules.exam_package.expected_total_weight is None
+
+
+def test_approved_exam_package_policy_requires_count_and_total_weight() -> None:
+    rules = {
+        **VALID_RULES,
+        "exam_package": {
+            "approved": True,
+            "required_item_count": None,
+            "expected_total_weight": None,
+        },
+    }
+
+    with pytest.raises(ValidationError):
+        PolicyRules.model_validate(rules)
 
 
 @pytest.mark.parametrize(

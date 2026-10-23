@@ -20,6 +20,7 @@ from app.modules.curriculum.models import (
     Theme,
     ThemeRange,
 )
+from app.modules.exams.models import Exam, ExamItem, QuestionVersion
 from app.modules.identity.models import RoleGrant, User
 from app.modules.media.models import MediaAsset
 from app.modules.mentoring.models import MentoringSession, SessionTheme
@@ -62,6 +63,9 @@ MODEL_TYPES = (
     EligibilityReview,
     EligibilityCheck,
     MediaAsset,
+    QuestionVersion,
+    Exam,
+    ExamItem,
 )
 metadata: MetaData = Base.metadata
 

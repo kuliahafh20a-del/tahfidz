@@ -51,6 +51,11 @@ POLICY_RULES = {
         ],
     },
     "video_assessment": {"maximum_errors_for_enough": 3},
+    "exam_package": {
+        "approved": False,
+        "required_item_count": None,
+        "expected_total_weight": None,
+    },
 }
 
 # Every inclusive range is ordered and together covers QS 78:1 through QS 114:6 once.
