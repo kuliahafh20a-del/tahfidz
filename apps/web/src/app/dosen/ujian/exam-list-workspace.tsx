@@ -39,7 +39,7 @@ export function ExamListWorkspace({ mode }: { mode: "execution" | "summary" }) {
         description={
           execution
             ? "Catat skor dan bukti setiap butir tanpa kehilangan draft."
-            : "Tinjau status, kelengkapan, dan nilai D yang tersedia."
+            : "Tinjau status, kelengkapan, dan Nilai Ujian (Dosen) yang tersedia."
         }
         eyebrow={execution ? "D03 · Pelaksanaan ujian" : "D04 · Rekap ujian"}
         status={<StatusBadge tone="progress">{exams.length} ujian</StatusBadge>}
@@ -52,7 +52,7 @@ export function ExamListWorkspace({ mode }: { mode: "execution" | "summary" }) {
         <Card>
           <DataTable
             caption={execution ? "Daftar pelaksanaan ujian" : "Daftar rekap ujian"}
-            headings={["Peserta", "Jadwal", "Status", "Nilai D", "Tindakan"]}
+            headings={["Peserta", "Jadwal", "Status", "Nilai Ujian (Dosen)", "Tindakan"]}
             rows={exams.map((exam) => [
               `${exam.participant.display_name} · ${exam.participant.nim}`,
               dateTimeLabel(exam.scheduled_at),

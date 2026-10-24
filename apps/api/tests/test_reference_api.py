@@ -50,7 +50,7 @@ class StubReferenceService:
             {
                 "id": CURRICULUM_ID,
                 "version": "juz30-2026.1",
-                "title": "Kurikulum Juz 30 - 44 Tema",
+                "title": "Kurikulum Juz 30 - 40 Tema",
                 "published_at": PUBLISHED_AT,
                 "parts": [
                     {

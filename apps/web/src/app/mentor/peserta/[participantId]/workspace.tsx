@@ -124,7 +124,7 @@ export function MentorParticipantRecapWorkspace({ enrollmentId }: { enrollmentId
               </SupportPanel>
               <SupportPanel title="Agregasi nilai Mentor">
                 <p className={styles.supportCopy}>
-                  Nilai M belum dihitung sampai kebijakan agregasi disahkan. Riwayat ini tidak
+                  Nilai Proses Hafalan (Mentor) belum dihitung sampai kebijakan agregasi disahkan. Riwayat ini tidak
                   menampilkan nilai buatan.
                 </p>
               </SupportPanel>

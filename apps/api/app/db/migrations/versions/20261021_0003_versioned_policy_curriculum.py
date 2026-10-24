@@ -119,14 +119,13 @@ PARTS: tuple[tuple[str, tuple[tuple[str, tuple[tuple[int, int, int], ...]], ...]
             ("Al-'Adiyat", ((100, 1, 11),)),
             ("Al-Qari'ah", ((101, 1, 11),)),
             ("At-Takathur", ((102, 1, 8),)),
-            ("Al-'Asr", ((103, 1, 3),)),
-            ("Al-Humazah", ((104, 1, 9),)),
+            ("Al-'Asr dan Al-Humazah", ((103, 1, 3), (104, 1, 9))),
             ("Al-Fil dan Quraysh", ((105, 1, 5), (106, 1, 4))),
-            ("Al-Ma'un", ((107, 1, 7),)),
-            ("Al-Kawthar", ((108, 1, 3),)),
-            ("Al-Kafirun", ((109, 1, 6),)),
-            ("An-Nasr", ((110, 1, 3),)),
-            ("Al-Masad", ((111, 1, 5),)),
+            ("Al-Ma'un dan Al-Kawthar", ((107, 1, 7), (108, 1, 3))),
+            (
+                "Al-Masad, An-Nasr, dan Al-Kafirun",
+                ((109, 1, 6), (110, 1, 3), (111, 1, 5)),
+            ),
             ("Al-Ikhlas, Al-Falaq, dan An-Nas", ((112, 1, 4), (113, 1, 5), (114, 1, 6))),
         ),
     ),
@@ -434,8 +433,8 @@ def create_reference_triggers() -> None:
                      GROUP BY part.sequence_no
                   ) AS counts;
 
-                IF distribution IS DISTINCT FROM ARRAY[10, 8, 6, 5, 15] THEN
-                    RAISE EXCEPTION 'published curriculum requires theme distribution 10,8,6,5,15'
+                IF distribution IS DISTINCT FROM ARRAY[10, 8, 6, 5, 11] THEN
+                    RAISE EXCEPTION 'published curriculum requires theme distribution 10,8,6,5,11'
                         USING ERRCODE = 'check_violation';
                 END IF;
 
@@ -712,7 +711,7 @@ def seed_initial_references(
                 "id": CURRICULUM_ID,
                 "version": "juz30-2026.1",
                 "status": "draft",
-                "title": "Kurikulum Juz 30 - 44 Tema",
+                "title": "Kurikulum Juz 30 - 40 Tema",
                 "published_at": None,
             }
         ],

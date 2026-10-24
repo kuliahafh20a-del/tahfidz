@@ -24,6 +24,12 @@ const statusLabel: Record<GradeSnapshot["status"], string> = {
   needs_review: "Perlu peninjauan",
 };
 
+const componentLabel = {
+  k: "Nilai Keaktifan",
+  m: "Nilai Proses Hafalan (Mentor)",
+  d: "Nilai Ujian (Dosen)",
+} as const;
+
 export function ParticipantGradeWorkspace() {
   const [context, setContext] = useState<SessionContext | null>(null);
   const [snapshot, setSnapshot] = useState<GradeSnapshot | null>(null);
@@ -100,7 +106,7 @@ export function ParticipantGradeWorkspace() {
     >
       <PageHeader
         breadcrumbs={[{ href: "/peserta", label: "Beranda" }, { label: "Ujian dan nilai" }]}
-        description="Pantau kesiapan ujian, komponen K/M/D, nilai akhir, dan riwayat perhitungan."
+        description="Pantau Nilai Keaktifan, Nilai Proses Hafalan (Mentor), Nilai Ujian (Dosen), nilai akhir, dan riwayat perhitungan."
         eyebrow="P06 · Rekap akademik"
         status={
           snapshot ? (
@@ -141,7 +147,9 @@ export function ParticipantGradeWorkspace() {
             <>
               <SupportPanel title="Kebijakan nilai">
                 <p>Policy version {snapshot.policy_version}</p>
-                <p>Bobot K/M/D: 20% / 40% / 40%</p>
+                <p>Nilai Keaktifan: 20%</p>
+                <p>Nilai Proses Hafalan (Mentor): 50%</p>
+                <p>Nilai Ujian (Dosen): 30%</p>
               </SupportPanel>
               <SupportPanel title="Perbarui rekap">
                 <p>Snapshot lama tetap tersimpan ketika perhitungan baru diterbitkan.</p>
@@ -155,7 +163,7 @@ export function ParticipantGradeWorkspace() {
           <div className={styles.componentGrid}>
             {components.map((component) => (
               <Card key={component.key}>
-                <span className={styles.componentName}>{component.key.toUpperCase()}</span>
+                <span className={styles.componentName}>{componentLabel[component.key]}</span>
                 <strong className={styles.score}>{component.value ?? "—"}</strong>
                 <span>Bobot {Number(component.weight) * 100}%</span>
                 <StatusBadge tone={component.status === "available" ? "success" : "warning"}>
@@ -185,7 +193,14 @@ export function ParticipantGradeWorkspace() {
           <Card title="Riwayat snapshot">
             <DataTable
               caption="Riwayat perhitungan nilai"
-              headings={["Dihitung", "Status", "K", "M", "D", "N"]}
+              headings={[
+                "Dihitung",
+                "Status",
+                "Keaktifan",
+                "Proses Hafalan (Mentor)",
+                "Ujian (Dosen)",
+                "Nilai Akhir",
+              ]}
               rows={history.map((item) => [
                 dateTimeLabel(item.calculated_at),
                 statusLabel[item.status],

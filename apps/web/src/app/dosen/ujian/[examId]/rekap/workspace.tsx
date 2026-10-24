@@ -41,7 +41,7 @@ export function ExamSummaryWorkspace({ examId }: { examId: string }) {
           { href: "/dosen/ujian/rekap", label: "Rekap ujian" },
           { label: exam?.participant.display_name ?? "Ujian" },
         ]}
-        description="Nilai D hanya ditampilkan setelah seluruh butir, bukti, dan kebijakan agregasi tervalidasi."
+        description="Nilai Ujian (Dosen) hanya ditampilkan setelah seluruh butir, bukti, dan kebijakan agregasi tervalidasi."
         eyebrow="D04 · Rekap ujian"
         status={
           <StatusBadge tone={summary?.d_status === "available" ? "success" : "warning"}>
@@ -64,7 +64,7 @@ export function ExamSummaryWorkspace({ examId }: { examId: string }) {
         <WorkSupportLayout
           support={
             <>
-              <SupportPanel title="Nilai D">
+              <SupportPanel title="Nilai Ujian (Dosen)">
                 <p className={styles.score}>{exam.d_score ?? "—"}</p>
                 <p className={styles.muted}>
                   {summary.d_status === "available"

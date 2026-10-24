@@ -93,7 +93,7 @@ class ActivityScoreCalculator:
 class ActivityScoreService:
     """Derive K without mutating target or assessment history."""
 
-    REQUIRED_TARGETS = 44
+    REQUIRED_TARGETS = 40
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
@@ -211,8 +211,8 @@ class GradeSnapshotService:
 
     REQUIRED_PARTS = 5
     K_WEIGHT = Decimal("0.200")
-    M_WEIGHT = Decimal("0.400")
-    D_WEIGHT = Decimal("0.400")
+    M_WEIGHT = Decimal("0.500")
+    D_WEIGHT = Decimal("0.300")
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session

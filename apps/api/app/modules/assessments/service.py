@@ -41,6 +41,7 @@ from app.modules.cohorts.models import (
     EnrollmentStatus,
 )
 from app.modules.curriculum.models import PolicyStatus, Theme
+from app.modules.curriculum.ordering import memorization_code
 from app.modules.curriculum.schemas import PolicyRules
 from app.modules.mentoring.access import MentorActor
 from app.modules.mentoring.models import MentoringSession, SessionStatus, SessionTheme
@@ -624,7 +625,6 @@ class ThemeAssessmentService:
         subtype = self._subtype(record)
         session_theme = subtype.session_theme
         theme = session_theme.theme
-        offsets = {1: 0, 2: 10, 3: 18, 4: 24, 5: 29}
         return ThemeAssessmentResponse(
             assessment_id=record.id,
             session_id=session_theme.session_id,
@@ -638,7 +638,7 @@ class ThemeAssessmentService:
             theme=SessionThemeResponse(
                 id=session_theme.id,
                 theme_id=theme.id,
-                code=f"T{offsets[theme.part.sequence_no] + theme.sequence_no:02d}",
+                code=memorization_code(theme.part.sequence_no, theme.sequence_no),
                 name=theme.title,
                 part_id=theme.part.id,
                 part_no=theme.part.sequence_no,

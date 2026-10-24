@@ -73,7 +73,7 @@ export function VideoSubmissionWorkspace() {
       current.eligible = current.completed === current.total;
       grouped.set(current.id, current);
     }
-    return [...grouped.values()].sort((left, right) => left.no - right.no);
+    return [...grouped.values()].sort((left, right) => right.no - left.no);
   }, [targets]);
 
   async function submitVideo(event: FormEvent<HTMLFormElement>): Promise<void> {

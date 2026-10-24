@@ -23,6 +23,7 @@ from app.modules.calendar.schemas import (
 )
 from app.modules.cohorts.models import Cohort, Enrollment, EnrollmentStatus
 from app.modules.curriculum.models import Part, Theme
+from app.modules.curriculum.ordering import memorization_code, memorization_sort_key
 from app.modules.grading.schemas import ActivityScoreResponse, ActivityThemeScore
 from app.modules.grading.service import ActivityScoreService
 
@@ -32,7 +33,7 @@ class ParticipantEnrollmentNotFoundError(LookupError):
 
 
 class ParticipantTargetService:
-    """Build and read the immutable 44-theme calendar for one participant."""
+    """Build and read the immutable 40-theme calendar for one participant."""
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
@@ -47,14 +48,14 @@ class ParticipantTargetService:
         if enrollment is None:
             raise ParticipantEnrollmentNotFoundError("enrollment not found")
 
-        themes = list(
+        themes = sorted(
             await self.session.scalars(
                 select(Theme)
                 .join(Part, Part.id == Theme.part_id)
                 .where(Part.curriculum_version_id == enrollment.cohort.curriculum_version_id)
                 .options(joinedload(Theme.part))
-                .order_by(Part.sequence_no, Theme.sequence_no)
-            )
+            ),
+            key=lambda theme: memorization_sort_key(theme.part.sequence_no, theme.sequence_no),
         )
         rows = [
             {
@@ -64,7 +65,7 @@ class ParticipantTargetService:
                 "effective_due_date": enrollment.cohort.start_date + timedelta(weeks=index),
                 "status": (
                     TargetStatus.ACTIVE.value
-                    if theme.part.sequence_no == 1
+                    if theme.part.sequence_no == 5
                     else TargetStatus.SCHEDULED.value
                 ),
             }
@@ -156,15 +157,17 @@ class ParticipantTargetService:
         return enrollment
 
     async def _target_records(self, enrollment_id: UUID) -> list[Target]:
-        return list(
+        return sorted(
             await self.session.scalars(
                 select(Target)
                 .where(Target.enrollment_id == enrollment_id)
                 .options(selectinload(Target.theme).selectinload(Theme.part))
                 .join(Theme, Theme.id == Target.theme_id)
                 .join(Part, Part.id == Theme.part_id)
-                .order_by(Part.sequence_no, Theme.sequence_no)
-            )
+            ),
+            key=lambda target: memorization_sort_key(
+                target.theme.part.sequence_no, target.theme.sequence_no
+            ),
         )
 
     async def _target_responses_with_activity(
@@ -191,7 +194,7 @@ class ParticipantTargetService:
             active_part_no = incomplete[0].theme.part.sequence_no if incomplete else None
 
         responses: list[TargetResponse] = []
-        for ordinal, target in enumerate(targets, start=1):
+        for target in targets:
             activity = (activity_by_theme or {}).get(target.theme_id)
             part_no = target.theme.part.sequence_no
             locked_reason = None
@@ -199,8 +202,8 @@ class ParticipantTargetService:
             if target.status is TargetStatus.ACTIVE:
                 allowed_actions = ["request_session"]
             elif target.status is TargetStatus.SCHEDULED and active_part_no is not None:
-                if part_no > active_part_no:
-                    locked_reason = f"Selesaikan Bagian {part_no - 1} untuk membuka bagian ini."
+                if part_no < active_part_no:
+                    locked_reason = f"Selesaikan Bagian {part_no + 1} untuk membuka bagian ini."
                 else:
                     locked_reason = "Target belum memasuki periode aktif."
             elif target.status is TargetStatus.CLOSED:
@@ -211,7 +214,7 @@ class ParticipantTargetService:
                     id=target.id,
                     theme=TargetTheme(
                         id=target.theme.id,
-                        code=f"T{ordinal:02d}",
+                        code=memorization_code(part_no, target.theme.sequence_no),
                         name=target.theme.title,
                         part_id=target.theme.part.id,
                         part_no=part_no,
@@ -240,7 +243,7 @@ class ParticipantTargetService:
         )
         expected = sum(item.effective_due_date < today for item in targets)
         parts: list[PartProgress] = []
-        for part_no in sorted({item.theme.part_no for item in targets}):
+        for part_no in sorted({item.theme.part_no for item in targets}, reverse=True):
             part_targets = [item for item in targets if item.theme.part_no == part_no]
             part_completed = sum(item.status is TargetStatus.COMPLETED for item in part_targets)
             if part_targets and part_completed == len(part_targets):

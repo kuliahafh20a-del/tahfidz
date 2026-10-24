@@ -95,8 +95,8 @@ class GradeCalculationPolicy(BaseModel):
 
     approved: bool = False
     k_weight: float = 0.2
-    m_weight: float = 0.4
-    d_weight: float = 0.4
+    m_weight: float = 0.5
+    d_weight: float = 0.3
     graduation_threshold: float = 6.0
 
     @model_validator(mode="after")

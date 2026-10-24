@@ -32,7 +32,7 @@ def curriculum_engine() -> Iterator[Engine]:
     MIGRATION_DATABASE_URL is None,
     reason="MIGRATION_TEST_DATABASE_URL is required for PostgreSQL constraint tests",
 )
-def test_seed_covers_all_juz30_in_44_themes(curriculum_engine: Engine) -> None:
+def test_seed_covers_all_juz30_in_40_themes(curriculum_engine: Engine) -> None:
     with curriculum_engine.connect() as connection:
         assert set(inspect(connection).get_table_names(schema="app")) >= {
             "policy_versions",
@@ -63,8 +63,8 @@ def test_seed_covers_all_juz30_in_44_themes(curriculum_engine: Engine) -> None:
             )
         ).one()
 
-    assert distribution == [(1, 10), (2, 8), (3, 6), (4, 5), (5, 15)]
-    assert coverage == (44, 48, 564, 1, 564)
+    assert distribution == [(1, 10), (2, 8), (3, 6), (4, 5), (5, 11)]
+    assert coverage == (40, 48, 564, 1, 564)
 
 
 @pytest.mark.migration

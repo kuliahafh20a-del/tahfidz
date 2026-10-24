@@ -18,6 +18,13 @@ pnpm --filter @yaqin/api setup
 pnpm dev
 ```
 
+Pada Windows, gunakan skrip berikut untuk menyiapkan dependency yang belum ada dan
+menjalankan Next.js serta FastAPI sekaligus:
+
+```cmd
+dev.cmd
+```
+
 Web tersedia di `http://localhost:3000`, sedangkan API development di `http://localhost:8000`. Salin `.env.example` menjadi `.env` saat konfigurasi runtime mulai diperlukan; jangan commit `.env`.
 
 ## Docker Compose development

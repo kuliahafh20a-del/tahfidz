@@ -1,4 +1,4 @@
-"""Add participant targets and the 44-theme cohort calendar.
+"""Add participant targets and the curriculum cohort calendar.
 
 Revision ID: 20261023_0007
 Revises: 20261022_0006

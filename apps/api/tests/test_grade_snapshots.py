@@ -36,9 +36,9 @@ def snapshot(*, previous: UUID | None = None) -> GradeSnapshotResponse:
                 value=Decimal("8.250"), weight=Decimal("0.200"), status="available"
             ),
             "m": GradeComponentResponse(
-                value=None, weight=Decimal("0.400"), status="policy_pending"
+                value=None, weight=Decimal("0.500"), status="policy_pending"
             ),
-            "d": GradeComponentResponse(value=None, weight=Decimal("0.400"), status="not_assessed"),
+            "d": GradeComponentResponse(value=None, weight=Decimal("0.300"), status="not_assessed"),
         },
         final_score=None,
         graduation_status=None,
@@ -93,10 +93,10 @@ def test_grade_models_register_history_and_source_constraints() -> None:
 
 def test_final_score_uses_decimal_formula_without_float_rounding() -> None:
     assert GradeSnapshotService.final_score(Decimal("10"), Decimal("10"), Decimal("1")) == Decimal(
-        "6.400"
+        "7.300"
     )
     assert GradeSnapshotService.final_score(Decimal("8"), Decimal("8"), Decimal("3")) == Decimal(
-        "6.000"
+        "6.500"
     )
 
 

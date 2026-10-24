@@ -36,11 +36,11 @@ export const componentStatusLabel: Record<GradeComponent["status"], string> = {
 };
 
 export const missingRequirementLabel: Record<string, string> = {
-  activity_44_themes_incomplete: "Nilai K belum mencakup seluruh 44 tema.",
+  activity_44_themes_incomplete: "Nilai Keaktifan belum mencakup seluruh 40 tema.",
   five_parts_not_enough: "Lima bagian belum seluruhnya berstatus Cukup.",
   mentor_aggregation_policy: "Agregasi nilai Mentor belum disahkan.",
   mentor_assessments_incomplete: "Penilaian Mentor belum lengkap.",
   final_exam: "Ujian Dosen belum final.",
-  lecturer_component_unavailable: "Komponen D belum dapat dihitung.",
+  lecturer_component_unavailable: "Nilai Ujian (Dosen) belum dapat dihitung.",
   grade_calculation_policy: "Kebijakan perhitungan nilai akhir belum disahkan.",
 };
