@@ -409,7 +409,7 @@ async def assert_department_scope(
             assert enrollment.nim_snapshot == "NIM-001"
 
             targets = ParticipantTargetService(session)
-            assert await targets.generate_for_enrollment(program_context["enrollment"]) == 44
+            assert await targets.generate_for_enrollment(program_context["enrollment"]) == 40
             assert await targets.generate_for_enrollment(program_context["enrollment"]) == 0
 
             target = await session.scalar(

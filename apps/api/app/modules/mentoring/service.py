@@ -29,6 +29,7 @@ from app.modules.cohorts.models import (
     EnrollmentStatus,
 )
 from app.modules.curriculum.models import Theme
+from app.modules.curriculum.ordering import memorization_code, memorization_sort_key
 from app.modules.identity.models import User
 from app.modules.mentoring.access import MentorActor
 from app.modules.mentoring.models import (
@@ -485,10 +486,11 @@ class MentoringSessionService:
         )
 
     def _response(self, record: MentoringSession, *, role: str) -> SessionResponse:
-        offsets = {1: 0, 2: 10, 3: 18, 4: 24, 5: 29}
         themes = sorted(
             record.session_themes,
-            key=lambda item: (item.theme.part.sequence_no, item.theme.sequence_no),
+            key=lambda item: memorization_sort_key(
+                item.theme.part.sequence_no, item.theme.sequence_no
+            ),
         )
         return SessionResponse(
             id=record.id,
@@ -513,7 +515,7 @@ class MentoringSessionService:
                 SessionThemeResponse(
                     id=item.id,
                     theme_id=item.theme.id,
-                    code=(f"T{offsets[item.theme.part.sequence_no] + item.theme.sequence_no:02d}"),
+                    code=memorization_code(item.theme.part.sequence_no, item.theme.sequence_no),
                     name=item.theme.title,
                     part_id=item.theme.part.id,
                     part_no=item.theme.part.sequence_no,

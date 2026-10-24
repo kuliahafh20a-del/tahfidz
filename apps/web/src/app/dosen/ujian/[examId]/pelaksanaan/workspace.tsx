@@ -169,7 +169,7 @@ export function ExamExecutionWorkspace({ examId }: { examId: string }) {
         evidence_media_ids: ids,
         expected_version: exam.row_version,
       },
-      "Ujian difinalisasi dan nilai D dihitung dalam satu transaksi.",
+      "Ujian difinalisasi dan Nilai Ujian (Dosen) dihitung dalam satu transaksi.",
     );
   }
 
@@ -321,7 +321,9 @@ export function ExamExecutionWorkspace({ examId }: { examId: string }) {
           ) : null}
           {exam.status === "final" ? (
             <Card>
-              <Link href={`/dosen/ujian/${exam.id}/rekap`}>Buka rekap final dan nilai D</Link>
+              <Link href={`/dosen/ujian/${exam.id}/rekap`}>
+                Buka rekap final dan Nilai Ujian (Dosen)
+              </Link>
             </Card>
           ) : null}
         </WorkSupportLayout>

@@ -30,6 +30,7 @@ from app.modules.calendar.models import DeadlineChange, DeadlineChangeStatus, Ta
 from app.modules.cohorts.access import DepartmentActor
 from app.modules.cohorts.models import Cohort, Enrollment
 from app.modules.curriculum.models import Part, Theme
+from app.modules.curriculum.ordering import memorization_code
 
 
 class CalendarResourceNotFoundError(LookupError):
@@ -358,11 +359,9 @@ class DeadlineChangeService:
 
     @staticmethod
     def _theme(target: Target) -> CalendarTheme:
-        offsets = {1: 0, 2: 10, 3: 18, 4: 24, 5: 29}
-        ordinal = offsets[target.theme.part.sequence_no] + target.theme.sequence_no
         return CalendarTheme(
             id=target.theme.id,
-            code=f"T{ordinal:02d}",
+            code=memorization_code(target.theme.part.sequence_no, target.theme.sequence_no),
             name=target.theme.title,
             part_no=target.theme.part.sequence_no,
             part_name=target.theme.part.title,

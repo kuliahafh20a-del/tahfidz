@@ -61,7 +61,7 @@ def progress() -> ProgressResponse:
         status="active",
     )
     return ProgressResponse(
-        total_targets=44,
+        total_targets=40,
         completed_targets=0,
         overdue_targets=0,
         expected_completed_targets=0,
@@ -109,7 +109,7 @@ class StubParticipantTargetService:
             is_final=False,
             source_context=ActivitySourceContext(
                 cutoff_at=datetime(2027, 1, 2, tzinfo=UTC),
-                total_target_count=44,
+                total_target_count=40,
                 scored_target_count=1,
                 overdue_target_count=0,
                 themes=[
@@ -155,12 +155,12 @@ def test_participant_targets_are_paginated_and_filterable() -> None:
     assert response.json()["data"]["items"][0]["theme"]["code"] == "T01"
 
 
-def test_participant_progress_exposes_44_theme_projection() -> None:
+def test_participant_progress_exposes_40_theme_projection() -> None:
     with participant_client() as client:
         response = client.get("/api/v1/me/progress")
 
     assert response.status_code == 200
-    assert response.json()["data"]["total_targets"] == 44
+    assert response.json()["data"]["total_targets"] == 40
 
 
 def test_participant_activity_score_exposes_auditable_source_context() -> None:

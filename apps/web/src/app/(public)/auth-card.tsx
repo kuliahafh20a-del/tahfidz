@@ -24,6 +24,14 @@ type ApiError = {
   request_id?: string;
 };
 
+const roleDestinations: Record<string, string> = {
+  participant: "/peserta",
+  mentor: "/mentor/antrean",
+  lecturer: "/dosen/ujian",
+  department_admin: "/department/participants",
+  faculty_admin: "/",
+};
+
 async function postJson<T>(path: string, body: object): Promise<T> {
   const response = await fetch(`/api/v1/auth${path}`, {
     method: "POST",
@@ -55,9 +63,8 @@ export function AuthCard({ mode }: { mode: AuthMode }) {
         identifier: form.get("identifier"),
         password: form.get("password"),
       });
-      router.replace(
-        session.active_context?.role === "department_admin" ? "/department/participants" : "/",
-      );
+      const role = session.active_context?.role;
+      router.replace(role ? (roleDestinations[role] ?? "/") : "/");
       router.refresh();
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Gagal masuk.");

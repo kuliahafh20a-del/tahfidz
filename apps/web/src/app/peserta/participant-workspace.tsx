@@ -134,7 +134,7 @@ export function ParticipantWorkspace({ view }: { view: "dashboard" | "targets" }
         description={
           view === "dashboard"
             ? "Lihat target terdekat, bagian aktif, dan langkah berikutnya."
-            : "Ikuti 44 tema Juz 30 dalam lima bagian berdasarkan tenggat efektif."
+            : "Ikuti 40 tema Juz 30 dalam lima bagian berdasarkan tenggat efektif."
         }
         eyebrow={view === "dashboard" ? "P01 · Peserta" : "P02 · Peserta"}
         status={
@@ -255,7 +255,7 @@ function DashboardView({ dashboard }: { dashboard: Dashboard }) {
         />
       )}
       <Link className={styles.secondaryLink} href="/peserta/target">
-        Lihat seluruh 44 tema
+        Lihat seluruh 40 tema
       </Link>
     </WorkSupportLayout>
   );
@@ -337,7 +337,7 @@ function TargetsView({
             "Tenggat awal",
             "Tenggat efektif",
             "Status",
-            "Hasil / K",
+            "Hasil / Nilai Keaktifan",
             "Tindakan",
           ]}
           rows={targets.map((target) => [

@@ -27,7 +27,7 @@ describe("participant calendar permissions", () => {
     expect(canRequestSession({ ...activeTarget, allowed_actions: [] })).toBe(false);
   });
 
-  it("filters the 44-theme view by part", () => {
+  it("filters the 40-theme view by part", () => {
     const second = {
       ...activeTarget,
       id: "target-2",

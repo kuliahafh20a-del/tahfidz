@@ -203,14 +203,14 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-001, TASK-008  
 **Hasil:** Pengguna memperoleh navigasi responsif sesuai role dengan komponen visual yang konsisten.
 
-- [ ] Implementasikan design tokens dari `design.md`.
-- [ ] Buat header, sidebar/drawer, breadcrumb, dan page header.
-- [ ] Buat layout Area kerja dan Informasi pendamping.
-- [ ] Buat komponen tombol, input, status badge, card, tabel, dialog, dan state feedback.
-- [ ] Implementasikan navigasi Peserta, Mentor, Dosen, Admin Jurusan, dan Admin Fakultas.
-- [ ] Tampilkan role switcher hanya untuk pengguna dengan beberapa role aktif.
-- [ ] Tambahkan skip link, focus ring, keyboard navigation, dan live region.
-- [ ] Verifikasi layout desktop, tablet, ponsel, dan zoom 200 persen.
+- [x] Implementasikan design tokens dari `design.md`.
+- [x] Buat header, sidebar/drawer, breadcrumb, dan page header.
+- [x] Buat layout Area kerja dan Informasi pendamping.
+- [x] Buat komponen tombol, input, status badge, card, tabel, dialog, dan state feedback.
+- [x] Implementasikan navigasi Peserta, Mentor, Dosen, Admin Jurusan, dan Admin Fakultas.
+- [x] Tampilkan role switcher hanya untuk pengguna dengan beberapa role aktif.
+- [x] Tambahkan skip link, focus ring, keyboard navigation, dan live region.
+- [x] Verifikasi layout desktop, tablet, ponsel, dan zoom 200 persen.
 
 ### TASK-010 - Implementasikan kontrak API bersama
 
@@ -218,15 +218,15 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-004, TASK-008  
 **Hasil:** Seluruh endpoint memakai envelope, error model, pagination, request ID, dan client TypeScript yang konsisten.
 
-- [ ] Implementasikan success dan error envelope.
-- [ ] Implementasikan request ID dan structured logging.
-- [ ] Implementasikan error code domain dan field errors.
-- [ ] Implementasikan cursor pagination dan filter allowlist.
-- [ ] Implementasikan `expected_version` untuk optimistic concurrency.
-- [ ] Implementasikan penyimpanan `Idempotency-Key` pada schema operasi.
-- [ ] Publikasikan OpenAPI di development/staging.
-- [ ] Hasilkan client TypeScript pada CI.
-- [ ] Pastikan respons sensitif memakai `Cache-Control: no-store`.
+- [x] Implementasikan success dan error envelope.
+- [x] Implementasikan request ID dan structured logging.
+- [x] Implementasikan error code domain dan field errors.
+- [x] Implementasikan cursor pagination dan filter allowlist.
+- [x] Implementasikan `expected_version` untuk optimistic concurrency.
+- [x] Implementasikan penyimpanan `Idempotency-Key` pada schema operasi.
+- [x] Publikasikan OpenAPI di development/staging.
+- [x] Hasilkan client TypeScript pada CI.
+- [x] Pastikan respons sensitif memakai `Cache-Control: no-store`.
 
 ## 6. Target dan Kalender Peserta
 
@@ -236,15 +236,15 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-006, TASK-007, TASK-010  
 **Hasil:** Peserta dapat melihat target, tenggat efektif, bagian aktif, dan pekerjaan berikutnya.
 
-- [ ] Buat tabel dan model `targets`.
-- [ ] Generate target dari cohort dan kurikulum secara idempotent.
-- [ ] Validasi satu target per enrollment dan tema.
-- [ ] Buat proyeksi progres peserta.
-- [ ] Buat endpoint `/me/dashboard`, `/me/targets`, dan `/me/progress`.
-- [ ] Buat UI P01 Beranda peserta.
-- [ ] Buat UI P02 Target dan kalender.
-- [ ] Tampilkan alasan bagian terkunci dan `allowed_actions` dari server.
-- [ ] Tambahkan empty, loading, error, retry, dan locked state.
+- [x] Buat tabel dan model `targets`.
+- [x] Generate target dari cohort dan kurikulum secara idempotent.
+- [x] Validasi satu target per enrollment dan tema.
+- [x] Buat proyeksi progres peserta.
+- [x] Buat endpoint `/me/dashboard`, `/me/targets`, dan `/me/progress`.
+- [x] Buat UI P01 Beranda peserta.
+- [x] Buat UI P02 Target dan kalender.
+- [x] Tampilkan alasan bagian terkunci dan `allowed_actions` dari server.
+- [x] Tambahkan empty, loading, error, retry, dan locked state.
 
 ### TASK-012 - Bangun perubahan tenggat dengan approval dan audit
 
@@ -252,14 +252,14 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-011  
 **Hasil:** Admin Jurusan dapat mengusulkan dan mengesahkan perubahan tenggat tanpa menghapus tanggal lama.
 
-- [ ] Buat tabel `deadline_changes`.
-- [ ] Implementasikan pratinjau tanggal lama, baru, dan dampak target.
-- [ ] Terapkan approval sesuai mandat.
-- [ ] Perbarui `effective_due_date` dalam transaksi approval.
-- [ ] Pertahankan `initial_due_date` dan seluruh riwayat perubahan.
-- [ ] Buat endpoint pengajuan, approval, dan rejection.
-- [ ] Buat UI J02 Kalender angkatan.
-- [ ] Tambahkan concurrency, idempotency, dan audit test.
+- [x] Buat tabel `deadline_changes`.
+- [x] Implementasikan pratinjau tanggal lama, baru, dan dampak target.
+- [x] Terapkan approval sesuai mandat.
+- [x] Perbarui `effective_due_date` dalam transaksi approval.
+- [x] Pertahankan `initial_due_date` dan seluruh riwayat perubahan.
+- [x] Buat endpoint pengajuan, approval, dan rejection.
+- [x] Buat UI J02 Kalender angkatan.
+- [x] Tambahkan concurrency, idempotency, dan audit test.
 
 ## 7. Sesi dan Penilaian Tema
 
@@ -269,14 +269,14 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-007, TASK-009, TASK-011  
 **Hasil:** Peserta dapat mengajukan sesi dan Mentor dapat menjadwalkan serta memulai sesi.
 
-- [ ] Buat tabel `sessions` dan `session_themes`.
-- [ ] Validasi minimal satu tema dan satu bagian yang sama.
-- [ ] Validasi bagian aktif serta assignment Mentor.
-- [ ] Implementasikan state `proposed`, `scheduled`, `in_progress`, `completed`, `no_show`, dan `cancelled`.
-- [ ] Buat endpoint pengajuan dan manajemen sesi.
-- [ ] Buat UI P03 Ajukan sesi.
-- [ ] Tampilkan sesi pada UI M01 Binaan dan antrean.
-- [ ] Pastikan jadwal tidak dianggap tanggal setoran pertama.
+- [x] Buat tabel `sessions` dan `session_themes`.
+- [x] Validasi minimal satu tema dan satu bagian yang sama.
+- [x] Validasi bagian aktif serta assignment Mentor.
+- [x] Implementasikan state `proposed`, `scheduled`, `in_progress`, `completed`, `no_show`, dan `cancelled`.
+- [x] Buat endpoint pengajuan dan manajemen sesi.
+- [x] Buat UI P03 Ajukan sesi.
+- [x] Tampilkan sesi pada UI M01 Binaan dan antrean.
+- [x] Pastikan jadwal tidak dianggap tanggal setoran pertama.
 
 ### TASK-014 - Implementasikan penilaian tema end-to-end
 
@@ -284,17 +284,17 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-013, TASK-010, DEC-001  
 **Hasil:** Mentor dapat menyimpan draft, meninjau, dan memfinalisasi hasil setiap tema secara aman.
 
-- [ ] Buat `assessment_records`, `theme_assessments`, dan `incidents`.
-- [ ] Terapkan tepat satu subtype untuk assessment bertipe tema.
-- [ ] Implementasikan draft dan review sebelum finalisasi.
-- [ ] Validasi skor, insiden, bantuan, koreksi mandiri, outcome, dan policy version.
-- [ ] Alokasikan `attempt_no` 1-5 dengan row lock peserta-tema.
-- [ ] Ubah hasil kelima yang belum Cukup menjadi `follow_up`.
-- [ ] Cegah pembuatan kesempatan keenam otomatis.
-- [ ] Rekam tanggal aktual pertama yang sah untuk perhitungan K.
-- [ ] Buat UI M02 Catatan pembimbingan.
-- [ ] Buat hasil tema pada UI P05 dan rekap M05.
-- [ ] Tambahkan idempotency, concurrency, authorization, dan domain test.
+- [x] Buat `assessment_records`, `theme_assessments`, dan `incidents`.
+- [x] Terapkan tepat satu subtype untuk assessment bertipe tema.
+- [x] Implementasikan draft dan review sebelum finalisasi.
+- [x] Validasi skor, insiden, bantuan, koreksi mandiri, outcome, dan policy version.
+- [x] Alokasikan `attempt_no` 1-5 dengan row lock peserta-tema.
+- [x] Ubah hasil kelima yang belum Cukup menjadi `follow_up`.
+- [x] Cegah pembuatan kesempatan keenam otomatis.
+- [x] Rekam tanggal aktual pertama yang sah untuk perhitungan K.
+- [x] Buat UI M02 Catatan pembimbingan.
+- [x] Buat hasil tema pada UI P05 dan rekap M05.
+- [x] Tambahkan idempotency, concurrency, authorization, dan domain test.
 
 ## 8. Video dan Audio Mentor
 
@@ -304,15 +304,15 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-014  
 **Hasil:** Peserta dapat mengirim video bagian hanya setelah semua tema pada bagian tersebut Cukup.
 
-- [ ] Buat tabel `video_attempts` dan `video_versions`.
-- [ ] Alokasikan siklus mulai 1 dan revisi 0-3 di server.
-- [ ] Validasi prasyarat seluruh tema bagian berstatus Cukup.
-- [ ] Validasi URL HTTPS dan host allowlist.
-- [ ] Hindari server-side fetch ke URL sembarang.
-- [ ] Pastikan penggantian teknis menambah versi media, bukan revisi akademik.
-- [ ] Buat endpoint pembuatan attempt dan pengiriman versi.
-- [ ] Buat UI P04 Kirim video bagian.
-- [ ] Tambahkan test alokasi siklus/revisi dan request bersamaan.
+- [x] Buat tabel `video_attempts` dan `video_versions`.
+- [x] Alokasikan siklus mulai 1 dan revisi 0-3 di server.
+- [x] Validasi prasyarat seluruh tema bagian berstatus Cukup.
+- [x] Validasi URL HTTPS dan host allowlist.
+- [x] Hindari server-side fetch ke URL sembarang.
+- [x] Pastikan penggantian teknis menambah versi media, bukan revisi akademik.
+- [x] Buat endpoint pembuatan attempt dan pengiriman versi.
+- [x] Buat UI P04 Kirim video bagian.
+- [x] Tambahkan test alokasi siklus/revisi dan request bersamaan.
 
 ### TASK-016 - Implementasikan pemeriksaan kelayakan video
 
@@ -320,14 +320,14 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-015  
 **Hasil:** Mentor dapat menentukan kelayakan teknis video tanpa memberi hasil akademik.
 
-- [ ] Buat tabel `eligibility_reviews` dan `eligibility_checks`.
-- [ ] Implementasikan checklist berversi.
-- [ ] Wajibkan alasan untuk hasil `ineligible`.
-- [ ] Pastikan seluruh butir wajib lulus untuk hasil `eligible`.
-- [ ] Implementasikan draft dan finalisasi idempotent.
-- [ ] Buat UI M03 Kelayakan video.
-- [ ] Tampilkan alasan teknis dan tindakan kirim pengganti pada P05.
-- [ ] Pastikan hanya video eligible yang membuka penilaian akademik.
+- [x] Buat tabel `eligibility_reviews` dan `eligibility_checks`.
+- [x] Implementasikan checklist berversi.
+- [x] Wajibkan alasan untuk hasil `ineligible`.
+- [x] Pastikan seluruh butir wajib lulus untuk hasil `eligible`.
+- [x] Implementasikan draft dan finalisasi idempotent.
+- [x] Buat UI M03 Kelayakan video.
+- [x] Tampilkan alasan teknis dan tindakan kirim pengganti pada P05.
+- [x] Pastikan hanya video eligible yang membuka penilaian akademik.
 
 ### TASK-017 - Implementasikan upload dan playback audio privat
 
@@ -335,14 +335,14 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-002, TASK-010, DEC-003  
 **Hasil:** Mentor dapat mengunggah audio privat dan pengguna berwenang dapat memutarnya melalui URL sementara.
 
-- [ ] Buat tabel `media_assets`.
-- [ ] Implementasikan upload intent dan signed upload URL.
-- [ ] Validasi content type, ukuran, checksum, dan status media.
-- [ ] Implementasikan worker validasi media.
-- [ ] Implementasikan signed playback URL berumur pendek.
-- [ ] Terapkan authorization per objek saat membuat playback URL.
-- [ ] Pastikan signed URL tidak masuk log, analytics, atau database permanen.
-- [ ] Tambahkan test media gagal, dikarantina, dan tidak berwenang.
+- [x] Buat tabel `media_assets`.
+- [x] Implementasikan upload intent dan signed upload URL.
+- [x] Validasi content type, ukuran, checksum, dan status media.
+- [x] Implementasikan worker validasi media.
+- [x] Implementasikan signed playback URL berumur pendek.
+- [x] Terapkan authorization per objek saat membuat playback URL.
+- [x] Pastikan signed URL tidak masuk log, analytics, atau database permanen.
+- [x] Tambahkan test media gagal, dikarantina, dan tidak berwenang.
 
 ### TASK-018 - Implementasikan penilaian akademik video
 
@@ -350,16 +350,16 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-016, TASK-017, DEC-001  
 **Hasil:** Mentor dapat menilai video eligible, memberi audio, dan menghasilkan status bagian secara konsisten.
 
-- [ ] Buat tabel `video_assessments` sebagai subtype assessment.
-- [ ] Validasi review final eligible dan video version yang sama.
-- [ ] Hitung `counted_errors` dari incident di server.
-- [ ] Terapkan hasil 0-3 `enough` dan 4+ `not_enough` dari policy version.
-- [ ] Pastikan skor manual tidak mengubah outcome.
-- [ ] Wajibkan audio `available` sebelum finalisasi.
-- [ ] Buka revisi/siklus berikut sesuai aturan server.
-- [ ] Buat UI M04 Penilaian video.
-- [ ] Perbarui UI P05 dan M05 dengan hasil serta audio.
-- [ ] Tambahkan finalization transaction, idempotency, dan concurrency test.
+- [x] Buat tabel `video_assessments` sebagai subtype assessment.
+- [x] Validasi review final eligible dan video version yang sama.
+- [x] Hitung `counted_errors` dari incident di server.
+- [x] Terapkan hasil 0-3 `enough` dan 4+ `not_enough` dari policy version.
+- [x] Pastikan skor manual tidak mengubah outcome.
+- [x] Wajibkan audio `available` sebelum finalisasi.
+- [x] Buka revisi/siklus berikut sesuai aturan server.
+- [x] Buat UI M04 Penilaian video.
+- [x] Perbarui UI P05 dan M05 dengan hasil serta audio.
+- [x] Tambahkan finalization transaction, idempotency, dan concurrency test.
 
 ## 9. Ujian Dosen
 
@@ -369,16 +369,16 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-018, TASK-006  
 **Hasil:** Dosen melihat peserta yang memenuhi syarat dan dapat menyiapkan paket soal berversi.
 
-- [ ] Buat tabel `question_versions`, `exams`, dan `exam_items`.
-- [ ] Buat proyeksi eligibility lima bagian Cukup.
-- [ ] Validasi assignment Dosen aktif.
-- [ ] Implementasikan sumber soal aplikasi dan Dosen.
-- [ ] Simpan snapshot soal serta acuan jawaban pada exam item.
-- [ ] Batasi acuan jawaban hanya untuk penguji berwenang.
-- [ ] Buat endpoint antrean, draft ujian, dan paket soal.
-- [ ] Buat UI D01 Antrean ujian.
-- [ ] Buat UI D02 Paket soal.
-- [ ] Blokir finalisasi bila jumlah/bobot soal belum disahkan.
+- [x] Buat tabel `question_versions`, `exams`, dan `exam_items`.
+- [x] Buat proyeksi eligibility lima bagian Cukup.
+- [x] Validasi assignment Dosen aktif.
+- [x] Implementasikan sumber soal aplikasi dan Dosen.
+- [x] Simpan snapshot soal serta acuan jawaban pada exam item.
+- [x] Batasi acuan jawaban hanya untuk penguji berwenang.
+- [x] Buat endpoint antrean, draft ujian, dan paket soal.
+- [x] Buat UI D01 Antrean ujian.
+- [x] Buat UI D02 Paket soal.
+- [x] Blokir finalisasi bila jumlah/bobot soal belum disahkan.
 
 ### TASK-020 - Implementasikan pelaksanaan dan finalisasi ujian
 
@@ -386,15 +386,15 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-019, DEC-002  
 **Hasil:** Dosen dapat mencatat, meninjau, dan memfinalisasi ujian dengan bukti serta skor yang sah.
 
-- [ ] Buat `exam_assessments` sebagai subtype assessment.
-- [ ] Implementasikan draft penilaian per exam item.
-- [ ] Validasi skor 1-10, bukti pelaksanaan, paket, dan policy version.
-- [ ] Implementasikan finalisasi ujian dalam satu transaksi.
-- [ ] Hitung D hanya jika metode agregasi telah disahkan.
-- [ ] Buat UI D03 Pelaksanaan ujian.
-- [ ] Buat UI D04 Rekap ujian.
-- [ ] Perbarui kesiapan ujian dan rekap peserta.
-- [ ] Tambahkan idempotency, concurrency, dan authorization test.
+- [x] Buat `exam_assessments` sebagai subtype assessment.
+- [x] Implementasikan draft penilaian per exam item.
+- [x] Validasi skor 1-10, bukti pelaksanaan, paket, dan policy version.
+- [x] Implementasikan finalisasi ujian dalam satu transaksi.
+- [x] Hitung D hanya jika metode agregasi telah disahkan.
+- [x] Buat UI D03 Pelaksanaan ujian.
+- [x] Buat UI D04 Rekap ujian.
+- [x] Perbarui kesiapan ujian dan rekap peserta.
+- [x] Tambahkan idempotency, concurrency, dan authorization test.
 
 ## 10. Nilai dan Kelulusan
 
@@ -404,12 +404,12 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-012, TASK-014  
 **Hasil:** Sistem menghitung skor keaktifan dari tanggal setoran pertama dan tenggat efektif secara dapat diaudit.
 
-- [ ] Terapkan bucket keterlambatan hari 0, 1-7, 8-14, hingga lebih dari 49.
-- [ ] Gunakan zona waktu Asia/Jakarta.
-- [ ] Pastikan pengulangan tidak mengganti tanggal setoran pertama.
-- [ ] Jangan memberi nilai 1 pada target yang belum jatuh tempo.
-- [ ] Simpan cutoff, cakupan, tenggat, tanggal pertama, dan skor tema pada source context.
-- [ ] Uji batas hari 0, 1, 7, 8, 49, dan 50.
+- [x] Terapkan bucket keterlambatan hari 0, 1-7, 8-14, hingga lebih dari 49.
+- [x] Gunakan zona waktu Asia/Jakarta.
+- [x] Pastikan pengulangan tidak mengganti tanggal setoran pertama.
+- [x] Jangan memberi nilai 1 pada target yang belum jatuh tempo.
+- [x] Simpan cutoff, cakupan, tenggat, tanggal pertama, dan skor tema pada source context.
+- [x] Uji batas hari 0, 1, 7, 8, 49, dan 50.
 
 ### TASK-022 - Implementasikan snapshot nilai dan kelulusan
 
@@ -417,16 +417,16 @@ Keputusan berikut boleh dikerjakan paralel dengan fondasi teknis, tetapi harus d
 **Blocked by:** TASK-020, TASK-021, DEC-002  
 **Hasil:** Peserta dan petugas berwenang dapat melihat K/M/D/N serta status program tanpa nilai palsu.
 
-- [ ] Buat tabel `grade_snapshots` dan `grade_sources`.
-- [ ] Kumpulkan assessment final dan efektif sebagai sumber M/D.
-- [ ] Biarkan komponen yang belum tersedia sebagai `NULL`.
-- [ ] Hitung N dengan aritmetika desimal setelah seluruh komponen lengkap.
-- [ ] Validasi lima bagian Cukup dan ujian final sebelum kelulusan.
-- [ ] Pertahankan snapshot lama dan gunakan `supersedes_id`.
-- [ ] Buat endpoint rekap dan riwayat nilai.
-- [ ] Buat UI P06 Ujian dan nilai.
-- [ ] Tampilkan policy version dan alasan komponen belum tersedia.
-- [ ] Tambahkan reconstruction dan historical consistency test.
+- [x] Buat tabel `grade_snapshots` dan `grade_sources`.
+- [x] Kumpulkan assessment final dan efektif sebagai sumber M/D.
+- [x] Biarkan komponen yang belum tersedia sebagai `NULL`.
+- [x] Hitung N dengan aritmetika desimal setelah seluruh komponen lengkap.
+- [x] Validasi lima bagian Cukup dan ujian final sebelum kelulusan.
+- [x] Pertahankan snapshot lama dan gunakan `supersedes_id`.
+- [x] Buat endpoint rekap dan riwayat nilai.
+- [x] Buat UI P06 Ujian dan nilai.
+- [x] Tampilkan policy version dan alasan komponen belum tersedia.
+- [x] Tambahkan reconstruction dan historical consistency test.
 
 ## 11. Koreksi, Audit, dan Pelaporan
 

@@ -17,7 +17,7 @@ def _aware(value: datetime) -> datetime:
 
 
 class SessionCreate(BaseModel):
-    theme_ids: list[UUID] = Field(min_length=1, max_length=44)
+    theme_ids: list[UUID] = Field(min_length=1, max_length=40)
     method: SessionMethod
     proposed_at: datetime
     participant_note: str | None = Field(default=None, max_length=2_000)
