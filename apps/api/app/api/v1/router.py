@@ -11,6 +11,7 @@ from app.modules.calendar.router import router as participant_router
 from app.modules.cohorts.router import router as department_router
 from app.modules.curriculum.router import router as reference_router
 from app.modules.exams.router import router as exams_router
+from app.modules.grading.router import router as grading_router
 from app.modules.media.router import router as media_router
 from app.modules.mentoring.router import router as mentoring_router
 from app.modules.video.router import router as video_router
@@ -28,6 +29,7 @@ router.include_router(video_router)
 router.include_router(media_router)
 router.include_router(video_assessments_router)
 router.include_router(exams_router)
+router.include_router(grading_router)
 
 
 @router.get("", tags=["system"], response_model=SuccessEnvelope[dict[str, str]])

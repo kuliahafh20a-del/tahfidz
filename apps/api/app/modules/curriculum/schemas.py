@@ -77,6 +77,35 @@ class ExamPackagePolicy(BaseModel):
         return self
 
 
+class MentorAggregationPolicy(BaseModel):
+    """DEC-002 gate for deriving M from final mentor assessments."""
+
+    approved: bool = False
+    aggregation_method: Literal["simple_average"] | None = None
+
+    @model_validator(mode="after")
+    def require_method_when_approved(self) -> MentorAggregationPolicy:
+        if self.approved and self.aggregation_method is None:
+            raise ValueError("approved mentor aggregation requires an aggregation method")
+        return self
+
+
+class GradeCalculationPolicy(BaseModel):
+    """Versioned final-score weights and threshold."""
+
+    approved: bool = False
+    k_weight: float = 0.2
+    m_weight: float = 0.4
+    d_weight: float = 0.4
+    graduation_threshold: float = 6.0
+
+    @model_validator(mode="after")
+    def validate_weights(self) -> GradeCalculationPolicy:
+        if round(self.k_weight + self.m_weight + self.d_weight, 6) != 1:
+            raise ValueError("grade component weights must total 1")
+        return self
+
+
 class PolicyRules(BaseModel):
     """Validated JSON document stored by a policy version."""
 
@@ -84,6 +113,8 @@ class PolicyRules(BaseModel):
     score: IntegerScorePolicy
     video_assessment: VideoAssessmentPolicy = Field(default_factory=VideoAssessmentPolicy)
     exam_package: ExamPackagePolicy = Field(default_factory=ExamPackagePolicy)
+    mentor_aggregation: MentorAggregationPolicy = Field(default_factory=MentorAggregationPolicy)
+    grade_calculation: GradeCalculationPolicy = Field(default_factory=GradeCalculationPolicy)
 
 
 class PolicySummary(BaseModel):

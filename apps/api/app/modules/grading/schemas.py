@@ -30,3 +30,36 @@ class ActivityScoreResponse(BaseModel):
     value: Decimal | None
     is_final: bool
     source_context: ActivitySourceContext
+
+
+class GradeComponentResponse(BaseModel):
+    value: Decimal | None
+    weight: Decimal
+    status: Literal["available", "not_assessed", "policy_pending", "incomplete"]
+
+
+class GradeSourceResponse(BaseModel):
+    assessment_id: UUID
+    component: Literal["M", "D"]
+    contribution: Decimal | None
+
+
+class GradeSnapshotResponse(BaseModel):
+    id: UUID
+    enrollment_id: UUID
+    status: str
+    exam_readiness: Literal["not_ready", "ready_for_exam", "exam_in_progress", "exam_final"]
+    components: dict[Literal["k", "m", "d"], GradeComponentResponse]
+    final_score: Decimal | None
+    graduation_status: Literal["graduated", "not_graduated"] | None
+    policy_version_id: UUID
+    policy_version: str
+    calculated_at: datetime
+    supersedes_id: UUID | None
+    missing_requirements: list[str]
+    source_context: dict[str, object]
+    sources: list[GradeSourceResponse]
+
+
+class GradeHistoryResponse(BaseModel):
+    items: list[GradeSnapshotResponse]

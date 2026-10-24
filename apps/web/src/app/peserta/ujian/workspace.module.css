@@ -1,0 +1,49 @@
+.componentGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.componentGrid section {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.componentName {
+  color: var(--brand-700);
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.score {
+  color: var(--brand-950);
+  font-size: 2.5rem;
+}
+
+.finalScore {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.finalScore strong {
+  color: var(--brand-950);
+  font-size: 2rem;
+}
+
+.finalScore span,
+.componentGrid span {
+  color: var(--text-secondary);
+}
+
+.requirements {
+  display: grid;
+  margin: 0;
+  padding-left: var(--space-5);
+  gap: var(--space-2);
+}
+
+@media (max-width: 47.9375rem) {
+  .componentGrid {
+    grid-template-columns: 1fr;
+  }
+}
